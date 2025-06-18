@@ -1,6 +1,6 @@
 import { baseApi } from "@/redux/api/baseApi";
 import { TQueryParam, TResponseRedux } from "@/types/global";
-import { MetaData, TResearcher, TTeacher } from "@/types/userManagement.type";
+import { TResearcher, TTeacher } from "@/types/userManagement.type";
 
 const userManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -28,7 +28,7 @@ const userManagementApi = baseApi.injectEndpoints({
 
     // get ALL DATA
  getAllTeachers: builder.query({
-      query: (args) => {
+        query: (args) => {
         console.log(args);
         const params = new URLSearchParams();
 
@@ -44,7 +44,35 @@ const userManagementApi = baseApi.injectEndpoints({
         };
       },
       providesTags: ['user'],
-      transformResponse: (response: TResponseRedux<TTeacher[]>) => {
+      transformResponse: (response: TResponseRedux<TResearcher[]>) => {
+        console.log("Transformed Response:", response);
+
+        return {
+          data: response.data,
+          meta: response.meta,
+        };
+      },
+    }),
+    getAllStudents: builder.query({
+        query: (args) => {
+        console.log(args);
+        const params = new URLSearchParams();
+
+        if (args) {
+          args.forEach((item: TQueryParam) => {
+            params.append(item.name, item.value as string);
+          });
+        }
+        return {
+          url: '/students',
+          method: 'GET',
+          params: params,
+        };
+      },
+      providesTags: ['user'],
+      transformResponse: (response: TResponseRedux<TResearcher[]>) => {
+        console.log("Transformed Response:", response);
+
         return {
           data: response.data,
           meta: response.meta,
@@ -84,4 +112,4 @@ const userManagementApi = baseApi.injectEndpoints({
 });
 
 // ✅ Correct hook export
-export const {useGetAllResearchersQuery,useGetAllTeachersQuery, useStudentRegisterMutation , useTeacherRegisterMutation , useResearcherRegisterMutation} = userManagementApi;
+export const {useGetAllResearchersQuery,useGetAllStudentsQuery,useGetAllTeachersQuery, useStudentRegisterMutation , useTeacherRegisterMutation , useResearcherRegisterMutation} = userManagementApi;

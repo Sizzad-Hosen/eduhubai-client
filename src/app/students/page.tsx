@@ -1,8 +1,9 @@
+import StudentsDataPage from '@/pages/userManagement/StudentData'
 import React from 'react'
 
 const StudentsData = () => {
   return (
-    <div>StudentsData</div>
+  <StudentsDataPage></StudentsDataPage>
   )
 }
 

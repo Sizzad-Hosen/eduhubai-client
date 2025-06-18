@@ -1,8 +1,9 @@
+import TeachersDataPage from '@/pages/userManagement/TeachersData'
 import React from 'react'
 
 const TeachersData = () => {
   return (
-    <div>TeachersData</div>
+  <TeachersDataPage></TeachersDataPage>
   )
 }
 

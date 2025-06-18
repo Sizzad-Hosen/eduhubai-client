@@ -4,30 +4,38 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useLoginMutation } from "@/redux/features/auth/authApi";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  const validate = () => {
-    const newErrors: typeof errors = {};
-    if (!email) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = "Invalid email address";
+  const [addLogin] = useLoginMutation();
 
-    if (!password) newErrors.password = "Password is required";
-    else if (password.length < 6) newErrors.password = "Password must be at least 6 characters";
+  const [formdata,setFormdata] = useState({
+    email: "",
+    password: ""
+  })
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const handleSubmit =async (e: React.FormEvent) => {
+    e.preventDefault();
+    // handle form submission here
+
+    try {
+
+      const res = await addLogin(formdata).unwrap();
+      console.log("Login successful:", res);
+      // Handle successful login, e.g., store token, redirect user, etc.
+
+      // You can redirect the user or show a success message here
+    } catch (error) {
+      
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-
-    // Submit logic here
-    alert(`Logged in with:\nEmail: ${email}\nPassword: ${password}`);
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormdata({
+      ...formdata,
+      [e.target.id]: e.target.value
+    });
   };
 
   return (
@@ -47,18 +55,15 @@ const Login = () => {
             id="email"
             type="email"
             placeholder="name@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={formdata.email}
+            onChange={onChange}
             required
-            aria-invalid={!!errors.email}
+           
             aria-describedby="email-error"
-            className={errors.email ? "border-red-500 focus:ring-red-500" : ""}
+            className={ "border-red-500 focus:ring-red-500"  }
           />
-          {errors.email && (
-            <p id="email-error" className="mt-1 text-sm text-red-600">
-              {errors.email}
-            </p>
-          )}
+          
+         
         </div>
 
         <div>
@@ -69,18 +74,14 @@ const Login = () => {
             id="password"
             type="password"
             placeholder="Your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            value={formdata.password}
+            onChange={onChange}
             required
-            aria-invalid={!!errors.password}
+          
             aria-describedby="password-error"
-            className={errors.password ? "border-red-500 focus:ring-red-500" : ""}
+            className={ "border-red-500 focus:ring-red-500"}
           />
-          {errors.password && (
-            <p id="password-error" className="mt-1 text-sm text-red-600">
-              {errors.password}
-            </p>
-          )}
+         
         </div>
 
         <Button type="submit" className="w-full">

@@ -29,11 +29,17 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useAppSelector } from "@/redux/hook";
+import { useDispatch } from "react-redux";
+import { logout } from "@/redux/features/auth/authSlice";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // auth toggle
+
+  const dispatch = useDispatch();
+  const auth = useAppSelector((state) => state.auth);
+
 
   const navLinks = [
     { name: "Home", href: "/", icon: <Home size={16} /> },
@@ -72,8 +78,7 @@ export default function Navbar() {
             <Input placeholder="Search..." className="text-sm" />
           </div>
 
-          {/* Auth */}
-          {isLoggedIn ? (
+        
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar className="w-8 h-8">
@@ -89,7 +94,7 @@ export default function Navbar() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => setIsLoggedIn(false)}
+                 
                   className="flex items-center gap-2"
                 >
                   <LogOut size={16} />
@@ -97,14 +102,14 @@ export default function Navbar() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
+        
             <Button variant="outline" size="sm" asChild>
               <Link href="/login" className="flex items-center gap-1">
                 <LogIn size={16} />
                 Login
               </Link>
             </Button>
-          )}
+      
         </div>
 
         {/* Mobile Menu Toggle */}
@@ -132,26 +137,26 @@ export default function Navbar() {
             </Link>
           ))}
           <Input placeholder="Search..." className="text-sm" />
-          {isLoggedIn ? (
+       
             <div className="pt-2">
               <Link href="/dashboard" className="block text-sm py-1">
                 Dashboard
               </Link>
               <button
-                onClick={() => setIsLoggedIn(false)}
+                onClick={() => dispatch(logout())}
                 className="text-sm text-left text-red-600 py-1"
               >
                 Logout
               </button>
             </div>
-          ) : (
+        
             <Link
               href="/login"
               className="block text-blue-600 text-sm font-medium py-2"
             >
               Login
             </Link>
-          )}
+      
         </div>
       )}
     </nav>

@@ -46,9 +46,9 @@ export default function Navbar() {
   const navLinks = [
     { name: "Home", href: "/", icon: <Home size={16} /> },
     { name: "About", href: "/about", icon: <Info size={16} /> },
-    { name: "Student", href: "/student", icon: <Users size={16} /> },
-    { name: "Researcher", href: "/researcher", icon: <Users size={16} /> },
-    { name: "Teacher", href: "/teacher", icon: <Users size={16} /> },
+    { name: "Students", href: "/students", icon: <Users size={16} /> },
+    { name: "Researchers", href: "/researchers", icon: <Users size={16} /> },
+    { name: "Teachers", href: "/teachers", icon: <Users size={16} /> },
     { name: "Advanced Search", href: "/search", icon: <Search size={16} /> },
   
   ];
@@ -84,7 +84,7 @@ export default function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src="/avatar.png" />
+                  <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Avatar_The_Way_of_Water_Tokyo_Press_Conference_Stephen_Lang_%2852563431575%29_%28cropped%29.jpg/250px-Avatar_The_Way_of_Water_Tokyo_Press_Conference_Stephen_Lang_%2852563431575%29_%28cropped%29.jpg" />
                   <AvatarFallback>SH</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>

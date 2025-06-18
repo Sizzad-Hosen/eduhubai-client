@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
+import toast from "react-hot-toast";
 
 const Login = () => {
 
@@ -22,13 +23,21 @@ const Login = () => {
     try {
 
       const res = await addLogin(formdata).unwrap();
+
+       if (res.success === true) {
+      toast.success("Login successful!");
+    } else {
+      toast.error("Login failed!");
+    }
       console.log("Login successful:", res);
       // Handle successful login, e.g., store token, redirect user, etc.
 
       // You can redirect the user or show a success message here
     } catch (error) {
-      
-    }
+  toast.error("Login failed!");
+  console.error("Login error:", error);
+}
+
   };
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {

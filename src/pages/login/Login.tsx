@@ -6,11 +6,16 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import toast from "react-hot-toast";
+import { verifyToken } from "@/utils/verifyToken";
+import { setUser, TUser } from "@/redux/features/auth/authSlice";
+import { useAppDispatch } from "@/redux/hook";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
+const dispatch = useAppDispatch();
 
   const [addLogin] = useLoginMutation();
-
+const router = useRouter();
   const [formdata,setFormdata] = useState({
     email: "",
     password: ""
@@ -24,8 +29,23 @@ const Login = () => {
 
       const res = await addLogin(formdata).unwrap();
 
+      const token = res?.data?.accessToken;
+
+      
+      const user = verifyToken(res.data.accessToken) as TUser;
+
+      if (!user) {
+      throw new Error('Invalid token');
+}
+      dispatch(setUser({ user, token }));
+      
+      console.log('user',user);
+
+      console.log('token',token);
        if (res.success === true) {
+        router.push("/"); 
       toast.success("Login successful!");
+
     } else {
       toast.error("Login failed!");
     }

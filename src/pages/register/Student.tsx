@@ -9,9 +9,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Eye, EyeOff, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useStudentRegisterMutation } from "@/redux/features/userManagement/userMamagement.api";
+import { useRouter } from "next/router";
 
 
 const StudentPage = () => {
+
+  const router = useRouter();
   const [formData, setFormData] = useState({
     name: "sizzad",
     email: "sizzad@gmail.com",
@@ -37,7 +40,6 @@ const StudentPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const [addStudentRegister] = useStudentRegisterMutation();
-
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -81,7 +83,9 @@ const handleSubmit = async (e: React.FormEvent) => {
     console.log("Response from API:", res);
 
     if (res.success) {
+
       toast.success("Registration successful!");
+      router.push("/"); 
     } else {
       toast.error(res.message || "Something went wrong");
     }
@@ -90,8 +94,25 @@ const handleSubmit = async (e: React.FormEvent) => {
       "Error submitting form: "
         
     );
-  }
+    console.error("Error submitting form:", error);
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+      number: "",
+      city: "",
+      homeTown: "",
+      presentAddress: "",
+      experience: "",
+      skill: "",
+      university: "",
+      bio: "",
+      work: "",
+      academicInterests: "",
+      course: ""
+    })
 };
+}
 
   return (
     <div className="max-w-3xl mx-auto mt-10 p-4">

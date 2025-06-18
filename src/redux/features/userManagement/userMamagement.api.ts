@@ -16,8 +16,15 @@ const userManagementApi = baseApi.injectEndpoints({
         body: userInfo,
       }),
     }),
+    researcherRegister: builder.mutation({
+      query: (userInfo) => ({
+        url: '/users/create-researcher',
+        method: 'POST',
+        body: userInfo,
+      }),
+    }),
   }),
 });
 
 // ✅ Correct hook export
-export const { useStudentRegisterMutation , useTeacherRegisterMutation} = userManagementApi;
+export const { useStudentRegisterMutation , useTeacherRegisterMutation , useResearcherRegisterMutation} = userManagementApi;

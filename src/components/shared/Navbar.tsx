@@ -31,7 +31,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppSelector } from "@/redux/hook";
 import { useDispatch } from "react-redux";
-import { logout } from "@/redux/features/auth/authSlice";
+import { logout, selectCurrentUser } from "@/redux/features/auth/authSlice";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -39,7 +39,9 @@ export default function Navbar() {
 
   const dispatch = useDispatch();
   const auth = useAppSelector((state) => state.auth);
-
+ const user = useAppSelector(selectCurrentUser);
+ console.log("User in Navbar:", user);
+ 
 
   const navLinks = [
     { name: "Home", href: "/", icon: <Home size={16} /> },
@@ -48,7 +50,7 @@ export default function Navbar() {
     { name: "Researcher", href: "/researcher", icon: <Users size={16} /> },
     { name: "Teacher", href: "/teacher", icon: <Users size={16} /> },
     { name: "Advanced Search", href: "/search", icon: <Search size={16} /> },
-    { name: "Login", href: "/login", icon: <LogIn size={16} /> },
+  
   ];
 
   return (

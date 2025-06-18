@@ -1,9 +1,9 @@
-import TeacherPage from '@/pages/register/Teacher'
-import React from 'react'
+import ResearcherPage from '@/pages/register/Researcher'
+
 
 const Teacher = () => {
   return (
-    <TeacherPage></TeacherPage>
+   <ResearcherPage></ResearcherPage>
   )
 }
 

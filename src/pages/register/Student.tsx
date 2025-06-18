@@ -8,8 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Eye, EyeOff, X } from "lucide-react";
 import { toast } from "react-hot-toast";
-import Error from "next/error";
-import { error } from "console";
+import { useStudentRegisterMutation } from "@/redux/features/userManagement/userMamagement.api";
+
 
 const StudentPage = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +33,11 @@ const StudentPage = () => {
 
 
   const [skills, setSkills] = useState<string[]>([]);
+
   const [showPassword, setShowPassword] = useState(false);
+
+  const [addStudentRegister] = useStudentRegisterMutation();
+
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -54,28 +58,40 @@ const StudentPage = () => {
   const removeSkill = (skillToRemove: string) => {
     setSkills(skills.filter((skill) => skill !== skillToRemove));
   };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const finalData = {
-      ...formData,
-      skill: skills,
-    };
-    console.log("Submitted data:", finalData);
-    // Send this data to backend API
-
-    try {
-      // Simulate API call or add your API logic here
-      
-    } catch (error: any) {
-      toast.error(
-        "Error submitting form: " +
-          (typeof error === "object" && error !== null && "message" in error
-            ? (error as { message: string }).message
-            : String(error))
-      );
-    }
+  const finalData = {
+    ...formData,
+    address: {
+      city: formData.city,
+      homeTown: formData.homeTown,
+      presentAddress: formData.presentAddress,
+    },
+    skill: skills,
+    academicInterests: formData.academicInterests
+      .split(",")
+      .map((interest) => interest.trim()), // ensure it's an array
   };
+
+  console.log("Submitted data:", finalData);
+
+  try {
+    const res = await addStudentRegister(finalData).unwrap();
+    console.log("Response from API:", res);
+
+    if (res.success) {
+      toast.success("Registration successful!");
+    } else {
+      toast.error(res.message || "Something went wrong");
+    }
+  } catch (error: any) {
+    toast.error(
+      "Error submitting form: "
+        
+    );
+  }
+};
 
   return (
     <div className="max-w-3xl mx-auto mt-10 p-4">

@@ -1,15 +1,15 @@
+"use client"
 
-"use client";
-import TeacherDetails from '@/pages/userDetails/TeacherDetails';
-import { useGetSingleTeacherQuery } from '@/redux/features/userManagement/userMamagement.api';
+import ResearcherDetails from '@/pages/userDetails/ResearcherDetails';
+import { useGetSingleResearcherQuery } from '@/redux/features/userManagement/userMamagement.api';
 import { useParams } from 'next/navigation';
 import React from 'react'
 
-const TeachersDetailsPage = () => {
+const ResearcherDetailsPage = () => {
 
  const { id } = useParams(); 
 
-  const { data, isLoading, isError } = useGetSingleTeacherQuery(id as string); // ✅ useQuery, not mutation
+  const { data, isLoading, isError } = useGetSingleResearcherQuery(id as string); // ✅ useQuery, not mutation
 
   console.log("teacher ID:", id); 
     console.log("teacher Data:", data); // ✅
@@ -20,10 +20,8 @@ const TeachersDetailsPage = () => {
   return (
     <div className="p-6">
       <h1 className="text-xl font-bold mb-4">Student Profile</h1>
-      <TeacherDetails data={data.data} />
+      <ResearcherDetails data={data.data} />
     </div>
   );
 }
-
-
-export default TeachersDetailsPage
+export default ResearcherDetailsPage

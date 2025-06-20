@@ -32,6 +32,7 @@ const ResearchersDataPage = () => {
             {researchers.length > 0 ? (
               researchers.map((researcher: any) => (
                 <ProfileCard
+                 userType="researchers"
                   key={researcher._id}
                   id={researcher._id}
                   name={researcher.name}

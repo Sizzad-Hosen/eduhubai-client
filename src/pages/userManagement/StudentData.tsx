@@ -32,6 +32,7 @@ const StudentsDataPage = () => {
             {students.length > 0 ? (
               students.map((student: any) => (
                 <ProfileCard
+                  userType="students"
                   key={student._id}
                   id={student._id}
                   name={student.name}

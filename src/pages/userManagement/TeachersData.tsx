@@ -32,6 +32,7 @@ const TeachersDataPage = () => {
             {teachers.length > 0 ? (
               teachers.map((teacher: any) => (
                 <ProfileCard
+                 userType="teachers"
                   key={teacher._id}
                   id={teacher._id}
                   name={teacher.name}

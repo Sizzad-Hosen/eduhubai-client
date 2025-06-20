@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 type ProfileCardProps = {
   id: string;
   name: string;
+  userType: "students" | "teachers" | "researchers";
   email: string;
   university: string;
   skills: string[];
@@ -21,6 +22,7 @@ type ProfileCardProps = {
 const ProfileCard: React.FC<ProfileCardProps> = ({
   id,
   name,
+  userType,
   email,
   university,
   skills,
@@ -30,9 +32,10 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 }) => {
   const router = useRouter();
 
+
   const handleCardClick = () => {
-    console.log("Navigating to student details:", id);
-    router.push(`/students/${id}`);
+    console.log("Navigating to  details:", id);
+    router.push(`/${userType}/${id}`);
   };
 
   return (

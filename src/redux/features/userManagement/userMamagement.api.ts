@@ -125,6 +125,20 @@ export const userManagementApi = baseApi.injectEndpoints({
   }),
   providesTags: ['user'],
 }),
+ getSingleTeacher: builder.query({
+  query: (id: string) => ({
+    url: `/teachers/${id}`,
+    method: 'GET',
+  }),
+  providesTags: ['user'],
+}),
+ getSingleResearcher: builder.query({
+  query: (id: string) => ({
+    url: `/researchers/${id}`,
+    method: 'GET',
+  }),
+  providesTags: ['user'],
+}),
 
 
 
@@ -165,6 +179,9 @@ export const {
   useUpdateTeacherMutation
   ,
 useGetSingleStudentQuery
+  ,
+  useGetSingleResearcherQuery,
+  useGetSingleTeacherQuery
   ,
   useUpdateResearcherMutation
   ,

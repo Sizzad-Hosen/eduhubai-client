@@ -42,20 +42,19 @@ export default function Navbar() {
  const user = useAppSelector(selectCurrentUser);
  console.log("User in Navbar:", user);
  
-
   const navLinks = [
     { name: "Home", href: "/", icon: <Home size={16} /> },
     { name: "About", href: "/about", icon: <Info size={16} /> },
     { name: "Students", href: "/students", icon: <Users size={16} /> },
     { name: "Researchers", href: "/researchers", icon: <Users size={16} /> },
     { name: "Teachers", href: "/teachers", icon: <Users size={16} /> },
-    { name: "Advanced Search", href: "/search", icon: <Search size={16} /> },
+   
   
   ];
 
   return (
-    <nav className="border-b shadow-sm bg-white sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3 flex justify-between items-center">
+    <nav className="border-b shadow-sm  bg-white sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-5 flex justify-between items-center">
         <Link href="/" className="text-xl font-bold text-blue-600">
           EduHubAI
         </Link>
@@ -100,7 +99,12 @@ export default function Navbar() {
                   className="flex items-center gap-2"
                 >
                   <LogOut size={16} />
-                  Logout
+                     <button
+                onClick={() => dispatch(logout())}
+                className="text-sm text-left text-red-600 py-1"
+              >
+                Logout
+              </button>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

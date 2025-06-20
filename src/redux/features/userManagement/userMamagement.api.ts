@@ -2,7 +2,7 @@ import { baseApi } from "@/redux/api/baseApi";
 import { TQueryParam, TResponseRedux } from "@/types/global";
 import { TResearcher, TTeacher } from "@/types/userManagement.type";
 
-const userManagementApi = baseApi.injectEndpoints({
+export const userManagementApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     studentRegister: builder.mutation({
       query: (userInfo) => ({
@@ -27,8 +27,8 @@ const userManagementApi = baseApi.injectEndpoints({
     }),
 
     // get ALL DATA
- getAllTeachers: builder.query({
-        query: (args) => {
+    getAllTeachers: builder.query({
+      query: (args) => {
         console.log(args);
         const params = new URLSearchParams();
 
@@ -54,7 +54,7 @@ const userManagementApi = baseApi.injectEndpoints({
       },
     }),
     getAllStudents: builder.query({
-        query: (args) => {
+      query: (args) => {
         console.log(args);
         const params = new URLSearchParams();
 
@@ -81,7 +81,7 @@ const userManagementApi = baseApi.injectEndpoints({
     }),
 
     getAllResearchers: builder.query({
-       query: (args) => {
+      query: (args) => {
         console.log(args);
         const params = new URLSearchParams();
 
@@ -105,11 +105,42 @@ const userManagementApi = baseApi.injectEndpoints({
           meta: response.meta,
         };
       },
-  }),
+    }),
 
+    getME: builder.query({
+      query: () => ({
+        url: '/users/me',
+        method: 'GET',
+      }),
+      providesTags: ['user'],
+      transformResponse: (response: TResponseRedux<TResearcher | TTeacher>) => {
+      
+        return response.data;
+      },
+    }),
 
+    // update student user
+
+    updateStudent:builder.mutation({
+            query:(args)=>({
+                url:`/students/${args.id}`,
+                method:'PATCH',
+                body:args.data
+            }),
+            invalidatesTags:['user']
+        }),
+ 
   }),
 });
 
 // ✅ Correct hook export
-export const {useGetAllResearchersQuery,useGetAllStudentsQuery,useGetAllTeachersQuery, useStudentRegisterMutation , useTeacherRegisterMutation , useResearcherRegisterMutation} = userManagementApi;
+export const {
+  useGetMEQuery,
+  useGetAllResearchersQuery,
+  useGetAllStudentsQuery,
+  useGetAllTeachersQuery,
+  useStudentRegisterMutation,
+  useTeacherRegisterMutation,
+  useResearcherRegisterMutation,
+ useUpdateStudentMutation
+} = userManagementApi;

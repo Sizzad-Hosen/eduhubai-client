@@ -9,7 +9,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Eye, EyeOff, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useStudentRegisterMutation } from "@/redux/features/userManagement/userMamagement.api";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation"
 
 
 const StudentPage = () => {

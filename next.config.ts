@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         hostname: 'www.shutterstock.com',
         pathname: '/**', // allow all paths
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**', // allow all paths
+      },
     ],
   },
 };

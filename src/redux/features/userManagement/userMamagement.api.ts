@@ -130,12 +130,23 @@ export const userManagementApi = baseApi.injectEndpoints({
             invalidatesTags:['user']
         }),
  
+    updateTeacher:builder.mutation({
+            query:(args)=>({
+                url:`/teachers/${args.id}`,
+                method:'PATCH',
+                body:args.data
+            }),
+            invalidatesTags:['user']
+        }),
+ 
   }),
 });
 
 // ✅ Correct hook export
 export const {
   useGetMEQuery,
+  useUpdateTeacherMutation
+  ,
   useGetAllResearchersQuery,
   useGetAllStudentsQuery,
   useGetAllTeachersQuery,

@@ -138,6 +138,14 @@ export const userManagementApi = baseApi.injectEndpoints({
             }),
             invalidatesTags:['user']
         }),
+    updateResearcher:builder.mutation({
+            query:(args)=>({
+                url:`/researchers/${args.id}`,
+                method:'PATCH',
+                body:args.data
+            }),
+            invalidatesTags:['user']
+        }),
  
   }),
 });
@@ -146,6 +154,8 @@ export const userManagementApi = baseApi.injectEndpoints({
 export const {
   useGetMEQuery,
   useUpdateTeacherMutation
+  ,
+  useUpdateResearcherMutation
   ,
   useGetAllResearchersQuery,
   useGetAllStudentsQuery,

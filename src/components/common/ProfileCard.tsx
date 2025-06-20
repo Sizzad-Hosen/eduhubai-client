@@ -30,6 +30,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 }) => {
   const router = useRouter();
 
+  const handleCardClick = () => {
+    console.log("Navigating to student details:", id);
+    router.push(`/students/${id}`);
+  };
+
   return (
     <Card className="w-full max-w-md shadow-md hover:shadow-lg transition">
       <CardContent className="p-6">
@@ -58,7 +63,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         </div>
 
         <div className="mt-4 flex justify-between">
-          <Button variant="outline" onClick={() => router.push(`/profile/${id}`)}>
+          <Button variant="outline" onClick={handleCardClick}>
             Details
           </Button>
           <Button className="bg-green-600 text-white hover:bg-green-700">

@@ -118,6 +118,15 @@ export const userManagementApi = baseApi.injectEndpoints({
         return response.data;
       },
     }),
+ getSingleStudent: builder.query({
+  query: (id: string) => ({
+    url: `/students/${id}`,
+    method: 'GET',
+  }),
+  providesTags: ['user'],
+}),
+
+
 
     // update student user
 
@@ -154,6 +163,8 @@ export const userManagementApi = baseApi.injectEndpoints({
 export const {
   useGetMEQuery,
   useUpdateTeacherMutation
+  ,
+useGetSingleStudentQuery
   ,
   useUpdateResearcherMutation
   ,

@@ -9,7 +9,7 @@ import { toast } from "react-hot-toast";
 import Image from "next/image";
 import {useUpdateResearcherMutation, useUpdateTeacherMutation } from "@/redux/features/userManagement/userMamagement.api";
 
-const TeacherProfile = ({ data }: { data: any }) => {
+const ResearcherProfile = ({ data }: { data: any }) => {
 
 const [ updateResearcher] = useUpdateResearcherMutation();
 
@@ -81,6 +81,7 @@ const handleSave = async () => {
     researchPaper: Array.isArray(formData.researchPaper)
     ? formData.researchPaper.filter(paper => paper?.title?.trim()) 
     : [formData.researchPaper],
+
 
     };
 
@@ -348,4 +349,4 @@ const handleSave = async () => {
   );
 };
 
-export default TeacherProfile;
+export default ResearcherProfile;

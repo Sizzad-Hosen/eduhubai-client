@@ -4,7 +4,8 @@ import { useAppSelector } from "@/redux/hook";
 import { selectCurrentUser } from "@/redux/features/auth/authSlice";
 import { useGetMEQuery } from "@/redux/features/userManagement/userMamagement.api";
 import StudentProfile from "@/components/profile/StudentProfile";
-import TeacherProfile from "@/components/profile/TeacherProfile";
+
+import TeacherProfile from "@/components/profile/ResearcherProfile";
 import ResearcherProfile from "@/components/profile/ResearcherProfile";
 
 const ProfilePage = () => {
@@ -22,9 +23,28 @@ const ProfilePage = () => {
     <div className="max-w-5xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">👤 {role?.toUpperCase()} Profile</h1>
 
-      {role === "student" && <StudentProfile data={userData} />}
-      {role === "teacher" && <TeacherProfile data={userData} />}
-      {role === "researcher" && <ResearcherProfile data={userData} />}
+      {role === "student" && (
+        <>
+          {/* <StudentDetails data={userData} /> */}
+          <StudentProfile data={userData} />
+        </>
+      )}
+      {role === "teacher" && (
+     <>
+          <TeacherProfile data={userData} />
+          {/* <TeacherDetails data={userData} /> */}
+        </>
+
+      
+      )}      
+   
+      {role === "researcher" && (
+      <>
+          <ResearcherProfile data={userData} />
+          {/* <ResearcherDetails data={userData} /> */}
+        </>
+      )}
+      {/* 
       {/* {role === "admin" && <AdminProfile data={userData} />} */}
 
       {!["student", "teacher", "researcher", "admin"].includes(role ?? "") && (

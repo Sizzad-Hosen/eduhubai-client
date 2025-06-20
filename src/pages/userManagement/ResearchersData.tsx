@@ -5,6 +5,8 @@ import ProfileCard from "@/components/common/ProfileCard";
 import { useGetAllResearchersQuery } from "@/redux/features/userManagement/userMamagement.api";
 import { TQueryParam } from "@/types/global";
 import { Button } from "@/components/ui/button";
+import SearchBar from "@/components/common/Searchbar";
+import { teacherSearchableFields } from "@/constant/searchableFields";
 
 const ResearchersDataPage = () => {
   const [params, setParams] = useState<TQueryParam[]>([]);
@@ -24,6 +26,15 @@ const ResearchersDataPage = () => {
 
   return (
     <div className="p-6 space-y-6">
+
+             <SearchBar
+              searchableFields={teacherSearchableFields}
+              onSearch={(filters) =>
+                setParams(
+                  Object.entries(filters).map(([name, value]) => ({ name, value }))
+                )
+              }
+            />
       {isLoading ? (
         <p className="text-center py-10 text-lg">Loading researchers...</p>
       ) : (

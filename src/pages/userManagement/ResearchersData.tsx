@@ -7,6 +7,7 @@ import { TQueryParam } from "@/types/global";
 import { Button } from "@/components/ui/button";
 import SearchBar from "@/components/common/Searchbar";
 import { teacherSearchableFields } from "@/constant/searchableFields";
+import GlobalLoader from "@/components/common/GlobalLoader";
 
 const ResearchersDataPage = () => {
   const [params, setParams] = useState<TQueryParam[]>([]);
@@ -36,7 +37,7 @@ const ResearchersDataPage = () => {
               }
             />
       {isLoading ? (
-        <p className="text-center p-5 py-10 text-lg">Loading researchers...</p>
+       <GlobalLoader></GlobalLoader>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

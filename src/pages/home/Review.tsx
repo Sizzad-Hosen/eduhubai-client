@@ -30,7 +30,7 @@ const reviews = [
 
 export default function ReviewPage() {
   return (
-    <section className="min-h-screen bg-gray-100 dark:bg-gray-900 py-12 px-4 md:px-16">
+    <section className=" bg-gray-100 dark:bg-gray-900 py-12 px-4 md:px-16">
       <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-gray-800 dark:text-white">
         What Our Users Say
       </h2>

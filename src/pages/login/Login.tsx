@@ -10,9 +10,11 @@ import { verifyToken } from "@/utils/verifyToken";
 import { setUser, TUser } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/hook";
 import { useRouter } from "next/navigation";
+import GlobalLoader from "@/components/common/GlobalLoader";
 
 const Login = () => {
 const dispatch = useAppDispatch();
+const [loading,setLoading]= useState(false);
 
   const [addLogin] = useLoginMutation();
 const router = useRouter();
@@ -26,7 +28,7 @@ const router = useRouter();
     // handle form submission here
 
     try {
-
+ setLoading(true);
       const res = await addLogin(formdata).unwrap();
 
       const token = res?.data?.accessToken;
@@ -38,20 +40,16 @@ const router = useRouter();
       throw new Error('Invalid token');
 }
       dispatch(setUser({ user, token }));
-      
-      console.log('user',user);
 
-      console.log('token',token);
        if (res.success === true) {
+        setLoading(false);
         router.push("/"); 
       toast.success("Login successful!");
 
     } else {
       toast.error("Login failed!");
     }
-      console.log("Login successful:", res);
-      // Handle successful login, e.g., store token, redirect user, etc.
-
+ 
       // You can redirect the user or show a success message here
     } catch (error) {
   toast.error("Login failed!");
@@ -66,6 +64,10 @@ const router = useRouter();
       [e.target.id]: e.target.value
     });
   };
+
+  if(loading){
+   return  <GlobalLoader></GlobalLoader>
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">

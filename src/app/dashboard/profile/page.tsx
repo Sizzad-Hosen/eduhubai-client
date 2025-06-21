@@ -7,6 +7,7 @@ import StudentProfile from "@/components/profile/StudentProfile";
 import TeacherProfile from "@/components/profile/TeacherProfile";
 import ResearcherProfile from "@/components/profile/ResearcherProfile";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import GlobalLoader from "@/components/common/GlobalLoader";
 
 const ProfilePage = () => {
   const currentUser = useAppSelector(selectCurrentUser);
@@ -22,7 +23,7 @@ const ProfilePage = () => {
         </h1>
 
         {isLoading ? (
-          <p className="text-center">Loading profile...</p>
+        <GlobalLoader></GlobalLoader>
         ) : isError || !userData ? (
           <p className="text-center text-red-500">Error loading profile.</p>
         ) : role === "student" ? (

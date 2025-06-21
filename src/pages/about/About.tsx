@@ -1,9 +1,20 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Separator } from "@/components/ui/separator";
+import GlobalLoader from "@/components/common/GlobalLoader";
 
 const About = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 800); // simulate delay
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) return <GlobalLoader />;
+
   return (
     <main className="min-h-screen px-6 py-12 bg-white dark:bg-gray-950">
       <motion.div

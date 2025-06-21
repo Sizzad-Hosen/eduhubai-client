@@ -10,12 +10,14 @@ import { Eye, EyeOff, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useResearcherRegisterMutation } from "@/redux/features/userManagement/userMamagement.api";
 import { useRouter } from "next/navigation";
+import GlobalLoader from "@/components/common/GlobalLoader";
 
 const ResearcherPage = () => {
 
   const [addResearcherRegister] = useResearcherRegisterMutation();
 
   const router = useRouter();
+
 
 
 const [formData, setFormData] = useState({

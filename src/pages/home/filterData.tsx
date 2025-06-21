@@ -4,6 +4,7 @@ import React from "react";
 import { useGetFilterWiseQuery, useGetMEQuery } from "@/redux/features/userManagement/userMamagement.api";
 import ProfileCard from "@/components/common/ProfileCard";
 import { motion } from "framer-motion";
+import GlobalLoader from "@/components/common/GlobalLoader";
 
 const FilterData = () => {
   const { data: currentUser, isLoading: isUserLoading, isError: isUserError } = useGetMEQuery({});
@@ -71,7 +72,7 @@ const FilterData = () => {
       </h1>
 
       {isLoading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+       <GlobalLoader></GlobalLoader>
       ) : isError ? (
         <p className="text-center text-red-500">Failed to load data.</p>
       ) : (

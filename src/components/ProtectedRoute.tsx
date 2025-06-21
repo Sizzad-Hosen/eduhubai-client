@@ -4,6 +4,7 @@
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { useGetMEQuery } from "@/redux/features/userManagement/userMamagement.api";
+import GlobalLoader from "./common/GlobalLoader";
 
 export default function ProtectedRoute({
   children,
@@ -34,7 +35,7 @@ export default function ProtectedRoute({
     }
   }, [user, isLoading, isError, pathname]);
 
-  if (isLoading || !user) return <div className="text-center mt-10">Loading...</div>;
+  if (isLoading || !user) return <GlobalLoader></GlobalLoader>
 
   return <>{children}</>;
 }

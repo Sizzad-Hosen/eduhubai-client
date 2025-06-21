@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
-import {useUpdateResearcherMutation, useUpdateTeacherMutation } from "@/redux/features/userManagement/userMamagement.api";
+import {useUpdateResearcherMutation } from "@/redux/features/userManagement/userMamagement.api";
+import GlobalLoader from "../common/GlobalLoader";
 
 const ResearcherProfile = ({ data }: { data: any }) => {
 
-const [ updateResearcher] = useUpdateResearcherMutation();
+const [ updateResearcher, loading] = useUpdateResearcherMutation();
 
-console.log("researceher data:", data);
+
 
   const [editMode, setEditMode] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -99,12 +100,9 @@ const handleSave = async () => {
       data: formDataToSend,
     };
 
-    console.log("Updating with data:", updatedResearcherData);
-    // Await the mutation and get the response (updated student)
+
     const response = await updateResearcher(updatedResearcherData).unwrap();
 
-    console.log("Update response:", response);
-    // Update localData and formData with fresh data from response
     setLocalData(response);
 
     setFormData({
@@ -157,6 +155,11 @@ const handleSave = async () => {
     }
   }
 
+
+  if(loading)
+  {
+    <GlobalLoader></GlobalLoader>
+  }
   return (
     <Card className="p-6 space-y-6">
       <div className="flex justify-between items-center">

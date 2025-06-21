@@ -25,7 +25,7 @@ const ResearchersDataPage = () => {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 min-h-[70vh]">
 
              <SearchBar
               searchableFields={teacherSearchableFields}

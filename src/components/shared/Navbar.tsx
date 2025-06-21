@@ -32,6 +32,7 @@ import { Input } from "@/components/ui/input";
 import { useAppSelector } from "@/redux/hook";
 import { useDispatch } from "react-redux";
 import { logout, selectCurrentUser } from "@/redux/features/auth/authSlice";
+import { useGetMEQuery } from "@/redux/features/userManagement/userMamagement.api";
 
 
 
@@ -53,6 +54,10 @@ export default function Navbar() {
    
   
   ];
+
+  const { data } = useGetMEQuery({});
+  
+  console.log("User Data:", data?.profileImg);
 
   return (
     <nav className="border-b shadow-sm  bg-white sticky top-0 z-50">
@@ -89,7 +94,19 @@ export default function Navbar() {
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar className="w-8 h-8">
-                  <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Avatar_The_Way_of_Water_Tokyo_Press_Conference_Stephen_Lang_%2852563431575%29_%28cropped%29.jpg/250px-Avatar_The_Way_of_Water_Tokyo_Press_Conference_Stephen_Lang_%2852563431575%29_%28cropped%29.jpg" />
+                  {
+                    data?.profileImg ? (
+
+                      <AvatarImage src={data?.profileImg} />
+                    ) : (
+                    <AvatarImage src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Avatar_The_Way_of_Water_Tokyo_Press_Conference_Stephen_Lang_%2852563431575%29_%28cropped%29.jpg/250px-Avatar_The_Way_of_Water_Tokyo_Press_Conference_Stephen_Lang_%2852563431575%29_%28cropped%29.jpg" />
+                 
+                    )
+                  }
+
+
+          
+                 
                   <AvatarFallback>SH</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>

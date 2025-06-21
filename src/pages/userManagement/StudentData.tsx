@@ -25,8 +25,8 @@ const StudentsDataPage = () => {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="p-6 space-y-6">
-         <SearchBar
+    <div className="p-6 space-y-6 min-h-[70vh]">
+      <SearchBar
         searchableFields={studentSearchableFields}
         onSearch={(filters) =>
           setParams(
@@ -34,8 +34,11 @@ const StudentsDataPage = () => {
           )
         }
       />
+
       {isLoading ? (
-        <p className="text-center py-10 text-lg">Loading students...</p>
+        <div className="h-[300px] flex items-center justify-center text-lg text-gray-500">
+          Loading students...
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-1 p-5 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -55,7 +58,9 @@ const StudentsDataPage = () => {
                 />
               ))
             ) : (
-              <p className="col-span-full text-center text-gray-500">No students found.</p>
+              <p className="col-span-full text-center text-gray-500">
+                No students found.
+              </p>
             )}
           </div>
 
@@ -67,7 +72,9 @@ const StudentsDataPage = () => {
             >
               Previous
             </Button>
-            <span className="text-sm text-gray-600">Page {page} of {totalPages}</span>
+            <span className="text-sm text-gray-600">
+              Page {page} of {totalPages}
+            </span>
             <Button
               variant="outline"
               onClick={() => setPage((prev) => prev + 1)}

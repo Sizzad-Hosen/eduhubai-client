@@ -4,59 +4,40 @@ import { useAppSelector } from "@/redux/hook";
 import { selectCurrentUser } from "@/redux/features/auth/authSlice";
 import { useGetMEQuery } from "@/redux/features/userManagement/userMamagement.api";
 import StudentProfile from "@/components/profile/StudentProfile";
-
-import TeacherProfile from "@/components/profile/ResearcherProfile";
+import TeacherProfile from "@/components/profile/TeacherProfile";
 import ResearcherProfile from "@/components/profile/ResearcherProfile";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 const ProfilePage = () => {
-
-  const { data: userData, isLoading, isError } = useGetMEQuery({});
-
   const currentUser = useAppSelector(selectCurrentUser);
-
-  if (isLoading) return <p>Loading profile...</p>;
-  if (isError || !userData) return <p>Error loading profile</p>;
+  const { data: userData, isLoading, isError } = useGetMEQuery({});
 
   const role = currentUser?.role;
 
   return (
-
     <ProtectedRoute>
+      <div className="max-w-5xl mx-auto p-4 min-h-screen">
+        <h1 className="text-3xl font-bold text-center mb-8">
+          👤 {role?.toUpperCase()} Profile
+        </h1>
 
-   
-    <div className="max-w-5xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">👤 {role?.toUpperCase()} Profile</h1>
-
-      {role === "student" && (
-        <>
-          {/* <StudentDetails data={userData} /> */}
+        {isLoading ? (
+          <p className="text-center">Loading profile...</p>
+        ) : isError || !userData ? (
+          <p className="text-center text-red-500">Error loading profile.</p>
+        ) : role === "student" ? (
           <StudentProfile data={userData} />
-        </>
-      )}
-      {role === "teacher" && (
-     <>
+        ) : role === "teacher" ? (
           <TeacherProfile data={userData} />
-          {/* <TeacherDetails data={userData} /> */}
-        </>
-
-      
-      )}      
-   
-      {role === "researcher" && (
-      <>
+        ) : role === "researcher" ? (
           <ResearcherProfile data={userData} />
-          {/* <ResearcherDetails data={userData} /> */}
-        </>
-      )}
-      {/* 
-      {/* {role === "admin" && <AdminProfile data={userData} />} */}
-
-      {!["student", "teacher", "researcher", "admin"].includes(role ?? "") && (
-        <p>No matching profile UI for role: {role}</p>
-      )}
-    </div>
-     </ProtectedRoute>
+        ) : (
+          <p className="text-center text-gray-500">
+            No matching profile component for role: <strong>{role}</strong>
+          </p>
+        )}
+      </div>
+    </ProtectedRoute>
   );
 };
 

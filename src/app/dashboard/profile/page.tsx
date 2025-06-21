@@ -7,6 +7,7 @@ import StudentProfile from "@/components/profile/StudentProfile";
 
 import TeacherProfile from "@/components/profile/ResearcherProfile";
 import ResearcherProfile from "@/components/profile/ResearcherProfile";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const ProfilePage = () => {
 
@@ -20,6 +21,10 @@ const ProfilePage = () => {
   const role = currentUser?.role;
 
   return (
+
+    <ProtectedRoute>
+
+   
     <div className="max-w-5xl mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">👤 {role?.toUpperCase()} Profile</h1>
 
@@ -51,6 +56,7 @@ const ProfilePage = () => {
         <p>No matching profile UI for role: {role}</p>
       )}
     </div>
+     </ProtectedRoute>
   );
 };
 

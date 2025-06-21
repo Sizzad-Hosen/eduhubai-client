@@ -4,7 +4,7 @@ import React from "react";
 
 const Banner = () => {
   return (
-    <main className="relative min-h-screen overflow-hidden">
+    <main className="relative min-h-84  overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -19,7 +19,7 @@ const Banner = () => {
       </div>
 
       {/* Overlay content */}
-      <section className="relative z-10 min-h-screen flex items-center justify-center px-6 bg-black/40">
+      <section className="relative z-10 min-h-84 flex items-center justify-center px-6 bg-black/40">
         <div className="max-w-5xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center text-white py-16">
           {/* Text Content */}
           <div className="space-y-6">

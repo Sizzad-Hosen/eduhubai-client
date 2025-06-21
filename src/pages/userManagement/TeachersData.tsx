@@ -25,7 +25,7 @@ const TeachersDataPage = () => {
   const totalPages = Math.ceil(total / limit);
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 ">
            <SearchBar
         searchableFields={teacherSearchableFields}
         onSearch={(filters) =>
@@ -38,7 +38,7 @@ const TeachersDataPage = () => {
         <p className="text-center py-10 text-lg">Loading teachers...</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid mx-auto p-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {teachers.length > 0 ? (
               teachers.map((teacher: any) => (
                 <ProfileCard

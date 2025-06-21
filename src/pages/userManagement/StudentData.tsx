@@ -38,7 +38,7 @@ const StudentsDataPage = () => {
         <p className="text-center py-10 text-lg">Loading students...</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 p-5 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {students.length > 0 ? (
               students.map((student: any) => (
                 <ProfileCard

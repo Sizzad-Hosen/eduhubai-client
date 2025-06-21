@@ -169,6 +169,35 @@ export const userManagementApi = baseApi.injectEndpoints({
             }),
             invalidatesTags:['user']
         }),
+
+        // filtering wise data
+    getFilterWise: builder.query({
+
+      query: (args) => {
+        console.log(args);
+        const params = new URLSearchParams();
+
+        if (args) {
+          args.forEach((item: TQueryParam) => {
+            params.append(item.name, item.value as string);
+          });
+        }
+        return {
+          url: '/users/match',
+          method: 'GET',
+          params: params,
+        };
+      },
+      providesTags: ['user'],
+      transformResponse: (response: TResponseRedux<TResearcher[]>) => {
+        console.log("Transformed Response:", response);
+
+        return {
+          data: response.data,
+          meta: response.meta,
+        };
+      },
+    }),
  
   }),
 });
@@ -178,7 +207,8 @@ export const {
   useGetMEQuery,
   useUpdateTeacherMutation
   ,
-useGetSingleStudentQuery
+useGetSingleStudentQuery,
+useGetFilterWiseQuery
   ,
   useGetSingleResearcherQuery,
   useGetSingleTeacherQuery

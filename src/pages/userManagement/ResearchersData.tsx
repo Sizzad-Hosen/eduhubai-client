@@ -36,7 +36,7 @@ const ResearchersDataPage = () => {
               }
             />
       {isLoading ? (
-        <p className="text-center py-10 text-lg">Loading researchers...</p>
+        <p className="text-center p-5 py-10 text-lg">Loading researchers...</p>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         hostname: 'res.cloudinary.com',
         pathname: '/**', // allow all paths
       },
+      {
+        protocol: 'https',
+        hostname: 'i.postimg.cc',
+        pathname: '/**', // allow all paths
+      },
     ],
   },
 };

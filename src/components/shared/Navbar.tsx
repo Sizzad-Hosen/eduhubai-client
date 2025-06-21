@@ -33,6 +33,8 @@ import { useAppSelector } from "@/redux/hook";
 import { useDispatch } from "react-redux";
 import { logout, selectCurrentUser } from "@/redux/features/auth/authSlice";
 
+
+
 export default function Navbar() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -56,7 +58,11 @@ export default function Navbar() {
     <nav className="border-b shadow-sm  bg-white sticky top-0 z-50">
       <div className="container mx-auto px-4 py-5 flex justify-between items-center">
         <Link href="/" className="text-xl font-bold text-blue-600">
-          EduHubAI
+          <img 
+          src={"https://i.postimg.cc/Qtw1MT39/logo-removebg-preview.png"} 
+          width={120}
+           height={120}
+            alt="logo" />
         </Link>
 
         {/* Desktop Nav */}

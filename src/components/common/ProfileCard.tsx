@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useSendConnectionRequestMutation } from "@/redux/features/connection/connection.api";
 
 type ProfileCardProps = {
   id: string;
@@ -38,6 +40,27 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     router.push(`/${userType}/${id}`);
   };
 
+  const [addSendRequest] = useSendConnectionRequestMutation();
+
+
+  const handleConnect = async (receiverId: string) => {
+
+  try {
+
+    const response = await addSendRequest({receiverId}).unwrap();
+
+   console.log("Connection request sent:", response);
+
+   if(response.success) {
+      toast.success("Connection request sent successfully!");
+    }
+
+  } catch (error) {
+    toast.error("Something went wrong.");
+  }
+};
+
+
   return (
     <Card className="w-full max-w-md shadow-md hover:shadow-lg transition">
       <CardContent className="p-6">
@@ -69,9 +92,15 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           <Button variant="outline" onClick={handleCardClick}>
             Details
           </Button>
-          <Button className="bg-green-600 text-white hover:bg-green-700">
+       
+         <div  className="bg-green-600 text-white rounded-2xl hover:bg-green-700">
+        
+          <Button variant="solid" onClick={() => handleConnect(id)}>
             Connect
           </Button>
+          
+         </div>
+
         </div>
       </CardContent>
     </Card>

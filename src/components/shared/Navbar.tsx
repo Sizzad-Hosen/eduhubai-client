@@ -14,6 +14,7 @@ import {
   UserCircle,
   LayoutDashboard,
   Info,
+  Bell,
 } from "lucide-react";
 import {
   Avatar,
@@ -131,6 +132,15 @@ export default function Navbar() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            {/* notification */}
+            <Button variant="outline" size="sm" asChild>
+                <Link href="/notification" className="flex items-center gap-1">
+                <Bell size={16} />
+
+                Notification
+              </Link>
+            </Button>
         
             <Button variant="outline" size="sm" asChild>
               <Link href="/login" className="flex items-center gap-1">

@@ -13,6 +13,24 @@ export const conectionApi = baseApi.injectEndpoints({
       }),
     }),
 
+    getSentRequests: builder.query({
+      query: () => "/connection/received",
+      
+      providesTags: ["Connection"],
+    }),
+
+
+   updateConnectionRequest: builder.mutation({
+   query: ({ id, status }) => ({
+    url: `/connection/respond/${id}`,
+    method: "PUT",
+    body: { status },
+  }),
+
+
+  invalidatesTags: ["Connection"],
+}),
+
    
  
   }),
@@ -21,5 +39,7 @@ export const conectionApi = baseApi.injectEndpoints({
 // ✅ Correct hook export
 export const {
     useSendConnectionRequestMutation,
+    useGetSentRequestsQuery,
+    useUpdateConnectionRequestMutation
   
 } = conectionApi;

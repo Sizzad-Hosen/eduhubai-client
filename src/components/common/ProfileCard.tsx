@@ -33,7 +33,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
   profileImg,
 }) => {
   const router = useRouter();
-
+// const [getReciverId] = useget
 
   const handleCardClick = () => {
     console.log("Navigating to  details:", id);
@@ -56,7 +56,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
     }
 
   } catch (error) {
-    toast.error("Something went wrong.");
+    toast.error("Something went wrong or already sent a request");
   }
 };
 
@@ -95,7 +95,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
        
          <div  className="bg-green-600 text-white rounded-2xl hover:bg-green-700">
         
-          <Button variant="solid" onClick={() => handleConnect(id)}>
+          <Button variant="default" onClick={() => handleConnect(id)}>
             Connect
           </Button>
           

@@ -22,6 +22,8 @@ const StudentsDataPage = () => {
   ]);
 
   const students = studentData?.data || [];
+
+  console.log("Students Data:", students);
   const total = studentData?.meta?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
@@ -48,6 +50,7 @@ const StudentsDataPage = () => {
                   key={student._id}
                   id={student._id}
                   name={student.name}
+                
                   email={student.email}
                   profileImg={student.profileImg}
                   university={student.bsc || "N/A"}

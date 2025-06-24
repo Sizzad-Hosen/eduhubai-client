@@ -141,7 +141,6 @@ export const userManagementApi = baseApi.injectEndpoints({
 }),
 
 
-
     // update student user
 
     updateStudent:builder.mutation({

@@ -31,6 +31,17 @@ export const conectionApi = baseApi.injectEndpoints({
   invalidatesTags: ["Connection"],
 }),
 
+// getaccepted query
+
+ getRequestConfrim: builder.query({
+  query: () => ({
+    url: `/connection/getConfrimRequest`,
+    method: 'GET',
+  }),
+  providesTags: ['Connection'],
+}),
+
+
    
  
   }),
@@ -40,6 +51,7 @@ export const conectionApi = baseApi.injectEndpoints({
 export const {
     useSendConnectionRequestMutation,
     useGetSentRequestsQuery,
-    useUpdateConnectionRequestMutation
+    useUpdateConnectionRequestMutation,
+    useGetRequestConfrimQuery
   
 } = conectionApi;

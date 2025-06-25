@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   Info,
   Bell,
+  ChartBarStackedIcon,
 } from "lucide-react";
 import {
   Avatar,
@@ -52,6 +53,7 @@ export default function Navbar() {
     { name: "Students", href: "/students", icon: <Users size={16} /> },
     { name: "Researchers", href: "/researchers", icon: <Users size={16} /> },
     { name: "Teachers", href: "/teachers", icon: <Users size={16} /> },
+    { name: "AIAssistance", href: "/research-assistant", icon: <ChartBarStackedIcon size={16} /> },
    
   
   ];

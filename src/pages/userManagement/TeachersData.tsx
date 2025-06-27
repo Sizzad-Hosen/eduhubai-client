@@ -47,6 +47,7 @@ const TeachersDataPage = () => {
                   key={teacher._id}
                   id={teacher._id}
                   name={teacher.name}
+                  role={teacher.role}
                   email={teacher.email}
                   profileImg={teacher.profileImg}
                   university={teacher.bsc || "N/A"}

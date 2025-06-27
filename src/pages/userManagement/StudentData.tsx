@@ -50,7 +50,7 @@ const StudentsDataPage = () => {
                   key={student._id}
                   id={student._id}
                   name={student.name}
-                
+                  role={student.role}
                   email={student.email}
                   profileImg={student.profileImg}
                   university={student.bsc || "N/A"}

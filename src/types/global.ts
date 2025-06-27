@@ -33,3 +33,6 @@ export type TQueryParam = {
 };
 
 export type TResponseRedux<T> = TResponse<T> & BaseQueryApi;
+
+
+

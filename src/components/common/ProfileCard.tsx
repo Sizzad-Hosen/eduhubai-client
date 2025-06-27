@@ -12,6 +12,7 @@ import { useSendConnectionRequestMutation } from "@/redux/features/connection/co
 type ProfileCardProps = {
   id: string;
   name: string;
+  role:string;
   userType: "students" | "teachers" | "researchers";
   email: string;
   university: string;
@@ -24,6 +25,7 @@ type ProfileCardProps = {
 const ProfileCard: React.FC<ProfileCardProps> = ({
   id,
   name,
+  role,
   userType,
   email,
   university,

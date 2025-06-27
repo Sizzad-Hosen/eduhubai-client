@@ -56,3 +56,27 @@ export interface TResearcher {
     pdfFile?: string;     // For uploaded file path
   }[];
 }
+
+
+
+export interface UserDetailsProps {
+  data: {
+    name: string;
+    email?: string;
+    phone?: string;
+    experience?: string;
+    expertise?: string;
+    skills?: string[];
+    currentlyWorkingAt?: string;
+    bsc?: string;
+    msc?: string;
+    phd?: string;
+    academicInterests?: string[];
+    bio?: string;
+    researchArea?: string;
+    researchPaper?: ResearchPaper;
+    address?: Address;
+    role?: "Student" | "Teacher" | "Researcher" | string;
+    [key: string]: any; // allow extra props
+  };
+}

@@ -48,6 +48,7 @@ const ResearchersDataPage = () => {
                   key={researcher._id}
                   id={researcher._id}
                   name={researcher.name}
+                  role={researcher.role}
                   email={researcher.email}
                   profileImg={researcher.profileImg}
                   university={researcher.university || "N/A"}

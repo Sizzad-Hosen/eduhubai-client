@@ -2,27 +2,42 @@
 
 import React from "react";
 import { useParams } from "next/navigation";
-import { StudentDetails } from "@/pages/userDetails/StudentDetails";
+
 import { useGetSingleStudentQuery } from "@/redux/features/userManagement/userMamagement.api";
+import UserDetails from "@/components/common/UserDetails";
+import GlobalLoader from "@/components/common/GlobalLoader";
+import { useSendConnectionRequestMutation } from "@/redux/features/connection/connection.api";
+import toast from "react-hot-toast";
 
 const StudentDetailPage = () => {
+  const { id } = useParams();
 
-  const { id } = useParams(); // ✅ dynamic [id] route থেকে id নিচ্ছে
+  const { data, isLoading, isError } = useGetSingleStudentQuery(id as string);
 
-  const { data, isLoading, isError } = useGetSingleStudentQuery(id as string); // ✅ useQuery, not mutation
+  const [addSendRequest] = useSendConnectionRequestMutation();
 
+  const handleConnect = async (receiverId: string) => {
+    try {
+      const response = await addSendRequest({ receiverId }).unwrap();
+      console.log("Connection request sent:", response);
 
-  console.log("Student ID:", id); // ✅ id টি console এ দেখাচ্ছে
-    console.log("Student Data:", data); // ✅
+      if (response.success) {
+        toast.success("Connection request sent successfully!");
+      } else {
+        toast.error("Failed to send connection request.");
+      }
+    } catch (error) {
+      toast.error("Something went wrong or already sent a request.");
+    }
+  };
 
-
-  if (isLoading) return <p className="p-6">Loading...</p>;
-  if (isError || !data) return <p className="p-6 text-red-500">Error loading student data.</p>;
+  if (isLoading) return <GlobalLoader />;
+  if (isError || !data?.data)
+    return <p className="p-6 text-red-500">Error loading student data.</p>;
 
   return (
     <div className="p-6">
-      <h1 className="text-xl font-bold mb-4">Student Profile</h1>
-      <StudentDetails data={data.data} />
+      <UserDetails data={data.data} onConnect={handleConnect} />
     </div>
   );
 };

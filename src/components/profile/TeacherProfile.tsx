@@ -7,16 +7,43 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "react-hot-toast";
 import Image from "next/image";
-import {useUpdateTeacherMutation } from "@/redux/features/userManagement/userMamagement.api";
+import { useUpdateTeacherMutation } from "@/redux/features/userManagement/userMamagement.api";
 
 const TeacherProfile = ({ data }: { data: any }) => {
-
-console.log("Teacher data:", data);
-
+  // State to toggle edit mode
   const [editMode, setEditMode] = useState(false);
+
+  // Store selected profile image file for upload & preview URL
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(data.profileImg || null);
+
+  // Skill input (for adding new skill on Enter)
   const [skillInput, setSkillInput] = useState("");
 
+  // Local copy of data for editing
+  const [formData, setFormData] = useState({
+    name: data.name || "",
+    email: data.email || "",
+    number: data.number || "",
+    experience: data.experience || "",
+    expertise: data.expertise || "",
+    skill: data.skill || [],
+    university: data.university || "",
+    bsc: data.bsc || "",
+    msc: data.msc || "",
+    phd: data.phd || "",
+    academicInterests: data.academicInterests || [],
+    bio: data.bio || "",
+    address: {
+      city: data.address?.city || "",
+      homeTown: data.address?.homeTown || "",
+      presentAddress: data.address?.presentAddress || "",
+    },
+  });
+
+  const [updateTeacher] = useUpdateTeacherMutation();
+
+  // Handle profile picture file selection & preview
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
@@ -24,108 +51,37 @@ console.log("Teacher data:", data);
       setPreviewUrl(fileUrl);
     }
   };
+
+  // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    if (["city", "homeTown", "presentAddress"].includes(name)) {
+      setFormData((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          [name]: value,
+        },
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
+
+  // Remove a skill tag
   const removeSkill = (skill: string) => {
     setFormData((prev) => ({
       ...prev,
       skill: prev.skill.filter((s) => s !== skill),
     }));
   };
-  
-const [updateTeacher] = useUpdateTeacherMutation()
 
-const [localData, setLocalData] = useState(data);
-
-const [formData, setFormData] = useState({
-  name: localData.name || "",
-  email: localData.email || "",
-  number: localData.number || "",
-  experience: localData.experience || "",
-   expertise: localData.expertise || "",
-  skill: localData.skill || [],
-  university: localData.university || "",
-  bsc: localData.bsc || "",
- msc: localData.msc || "",
- phd: localData.phd || "",
-  academicInterests: localData.academicInterests || [],
-  bio: localData.bio || "",
-  address: {
-    city: localData.address?.city || "",
-    homeTown: localData.address?.homeTown || "",
-    presentAddress: localData.address?.presentAddress || "",
-  },
-});
-
-const [previewUrl, setPreviewUrl] = useState<string | null>(localData.profileImg || null);
-
-const handleSave = async () => {
-  try {
-    const payload = {
-      ...formData,
-      skill: formData.skill,
-      academicInterests: formData.academicInterests,
-    };
-
-    const formDataToSend = new FormData();
-    formDataToSend.append("data", JSON.stringify(payload));
-  
-
-    if (selectedFile) {
-      formDataToSend.append("file", selectedFile);
-    }
-
-    
-    const updatedTeacherData = {
-      id: data._id,
-      data: formDataToSend,
-    };
-
-    console.log("Updating with data:", updatedTeacherData);
-    // Await the mutation and get the response (updated student)
-    const response = await updateTeacher(updatedTeacherData).unwrap();
-
-    console.log("Update response:", response);
-    // Update localData and formData with fresh data from response
-    setLocalData(response);
-
-    setFormData({
-      name: response.name || "",
-      email: response.email || "",
-      number: response.number || "",
-      experience: response.experience || "",
-      expertise: response.expertise || "",
-      skill: response.skill || [],
-      university: response.university || "",
-      bsc: response.bsc || "",
-      msc: response.msc || "",
-      phd: response.phd || "",
-      academicInterests: response.academicInterests || [],
-      bio: response.bio || "",
-      address: {
-        city: response.address?.city || "",
-        homeTown: response.address?.homeTown || "",
-        presentAddress: response.address?.presentAddress || "",
-      },
-    });
-
-    setPreviewUrl(response.profileImg || null);
-
-    toast.success("Profile updated successfully");
-    setEditMode(false);
-  } catch (err: any) {
-    console.error("Update failed:", err);
-    toast.error("Failed to update profile: " + err.message);
-  }
-};
-
-
-  function handleSkillKeyDown(event: React.KeyboardEvent<HTMLInputElement>): void {
+  // Add skill on Enter keypress
+  const handleSkillKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && skillInput.trim()) {
       event.preventDefault();
       if (!formData.skill.includes(skillInput.trim())) {
@@ -136,85 +92,134 @@ const handleSave = async () => {
       }
       setSkillInput("");
     }
-  }
+  };
+
+  // Save updated data handler
+  const handleSave = async () => {
+    try {
+      const payload = {
+        ...formData,
+        skill: formData.skill,
+        academicInterests: formData.academicInterests,
+      };
+
+      const formDataToSend = new FormData();
+      formDataToSend.append("data", JSON.stringify(payload));
+
+      if (selectedFile) {
+        formDataToSend.append("file", selectedFile);
+      }
+
+      const updatedTeacherData = {
+        id: data._id,
+        data: formDataToSend,
+      };
+
+      const response = await updateTeacher(updatedTeacherData).unwrap();
+
+      // Update local state with response
+      setFormData({
+        name: response.name || "",
+        email: response.email || "",
+        number: response.number || "",
+        experience: response.experience || "",
+        expertise: response.expertise || "",
+        skill: response.skill || [],
+        university: response.university || "",
+        bsc: response.bsc || "",
+        msc: response.msc || "",
+        phd: response.phd || "",
+        academicInterests: response.academicInterests || [],
+        bio: response.bio || "",
+        address: {
+          city: response.address?.city || "",
+          homeTown: response.address?.homeTown || "",
+          presentAddress: response.address?.presentAddress || "",
+        },
+      });
+
+      setPreviewUrl(response.profileImg || null);
+
+      toast.success("Profile updated successfully");
+      setEditMode(false);
+    } catch (err: any) {
+      toast.error("Failed to update profile: " + err.message);
+    }
+  };
 
   return (
-    <Card className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold">🎓 Teacher Profile</h2>
+    <Card className="w-full max-w-5xl mx-auto px-4 py-6 md:p-8 rounded-2xl shadow-lg border bg-gradient-to-br from-white via-sky-50 to-sky-100 dark:from-slate-800 dark:via-slate-900 dark:to-slate-950 space-y-6">
+      <div className="flex justify-end items-center">
+        
         <Button variant="outline" onClick={() => setEditMode(!editMode)}>
           {editMode ? "Cancel" : "Edit"}
         </Button>
       </div>
+
       {editMode ? (
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          {/* Profile Picture */}
           <div className="md:col-span-2 space-y-2">
-            <label className="block font-medium">Profile Picture</label>
-          
-            <Input type="file" accept="image/*" onChange={handleFileChange} />
+            {previewUrl && (
+              <div className="flex justify-center mt-2">
+                <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden ring-4 ring-blue-300 dark:ring-blue-600 shadow-md bg-gradient-to-br from-white via-slate-100 to-slate-200 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+                  <Image src={previewUrl} alt="Profile Picture" layout="fill" className="object-cover" />
+                </div>
+              </div>
+            )}
+            <label className="block font-medium text-gray-700 dark:text-gray-300">Profile Picture</label>
+            <Input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md"
+            />
           </div>
 
-          <div>
-            <label className="block mb-1">Name</label>
-            <Input name="name" value={formData.name} onChange={handleChange} />
-          </div>
+          {/* Basic Info Fields */}
+          {[
+            ["name", "Name"],
+            ["email", "Email"],
+            ["number", "Phone"],
+            ["experience", "Experience"],
+            ["expertise", "Expertise"],
+            ["university", "University"],
+            ["bsc", "BSc"],
+            ["msc", "MSc"],
+            ["phd", "PhD"],
+          ].map(([name, label]) => (
+            <div key={name}>
+              <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">{label}</label>
+              <Input name={name} value={(formData as any)[name]} onChange={handleChange} />
+            </div>
+          ))}
 
-          <div>
-            <label className="block mb-1">Email</label>
-            <Input name="email" value={formData.email} onChange={handleChange} />
-          </div>
-
-          <div>
-            <label className="block mb-1">Phone</label>
-            <Input name="number" value={formData.number} onChange={handleChange} />
-          </div>
-
-          <div>
-            <label className="block mb-1">Experience</label>
-            <Input name="experience" value={formData.experience} onChange={handleChange} />
-          </div>
-          <div>
-            <label className="block mb-1">Expertise</label>
-            <Input name="expertise" value={formData.expertise} onChange={handleChange} />
-          </div>
-
-          <div>
-            <label className="block mb-1">Bsc</label>
-            <Input name="bsc" value={formData.bsc} onChange={handleChange} />
-          </div>
-          <div>
-            <label className="block mb-1">Msc</label>
-            <Input name="msc" value={formData.msc} onChange={handleChange} />
-          </div>
-          <div>
-            <label className="block mb-1">PHD</label>
-            <Input name="phd" value={formData.phd} onChange={handleChange} />
-          </div>
-        
-       
-
+          {/* Academic Interests */}
           <div className="md:col-span-2">
-            <label className="block mb-1">Academic Interests (comma separated)</label>
+            <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">
+              Academic Interests (comma separated)
+            </label>
             <Input
               name="academicInterests"
-              value={formData.academicInterests}
+              value={formData.academicInterests.join(",")}
               onChange={(e) => setFormData({ ...formData, academicInterests: e.target.value.split(",") })}
             />
           </div>
 
-        <div className="md:col-span-2">
-            <label className="block mb-1 font-medium">Skills</label>
-            <div className="flex flex-wrap gap-2 border rounded p-2 min-h-[40px]">
+          {/* Skills */}
+          <div className="md:col-span-2">
+            <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">Skills</label>
+            <div className="flex flex-wrap gap-2 border rounded-lg p-3 min-h-[48px] bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700 shadow-sm">
               {formData.skill.map((skill) => (
                 <div
                   key={skill}
-                  className="bg-blue-500 text-white px-3 py-1 rounded-full flex items-center space-x-2"
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-1 rounded-full flex items-center gap-2 text-sm shadow"
                 >
                   <span>{skill}</span>
                   <button
                     type="button"
                     onClick={() => removeSkill(skill)}
-                    className="text-white font-bold hover:text-gray-200"
+                    className="hover:text-red-100 transition"
                   >
                     &times;
                   </button>
@@ -225,67 +230,81 @@ const handleSave = async () => {
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
                 onKeyDown={handleSkillKeyDown}
-                className="flex-grow outline-none"
+                className="flex-grow outline-none bg-transparent text-sm placeholder:text-gray-400 dark:placeholder:text-gray-600"
                 placeholder="Type skill and press Enter"
               />
             </div>
           </div>
 
-
+          {/* Bio */}
           <div className="md:col-span-2">
-            <label className="block mb-1">Bio</label>
+            <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">Bio</label>
             <Textarea name="bio" value={formData.bio} onChange={handleChange} />
           </div>
 
-          <div>
-            <label className="block mb-1">City</label>
-            <Input name="city" value={formData.address.city} onChange={handleChange} />
-          </div>
+          {/* Address Fields */}
+          {[
+            ["city", "City"],
+            ["homeTown", "Home Town"],
+            ["presentAddress", "Present Address"],
+          ].map(([name, label]) => (
+            <div className={name === "presentAddress" ? "md:col-span-2" : ""} key={name}>
+              <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">{label}</label>
+              <Input
+                name={name}
+                value={(formData.address as any)[name]}
+                onChange={handleChange}
+              />
+            </div>
+          ))}
 
-          <div>
-            <label className="block mb-1">Home Town</label>
-            <Input name="homeTown" value={formData.address.homeTown} onChange={handleChange} />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block mb-1">Present Address</label>
-            <Input name="presentAddress" value={formData.address.presentAddress} onChange={handleChange} />
-          </div>
-
-          <div className="md:col-span-2 flex justify-center">
-            <Button type="button" onClick={handleSave} className="bg-blue-600 text-white">
+          {/* Save Button */}
+          <div className="md:col-span-2 flex justify-center mt-4">
+            <Button
+              type="button"
+              onClick={handleSave}
+              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-xl font-medium shadow-md transition"
+            >
               Save Changes
             </Button>
           </div>
         </form>
       ) : (
-        <div className="space-y-2">
-          {data.profileImg && (
-            <Image
-              src={data.profileImg}
-              alt="Profile"
-              width={100}
-              height={100}
-              className="rounded-full"
-            />
-          )}
-       
-          <p><strong>Name:</strong> {formData.name}</p>
-          <p><strong>Email:</strong> {formData.email}</p>
-          <p><strong>Phone:</strong> {formData.number}</p>
-          <p><strong>Experience:</strong> {formData.experience}</p>
-          <p><strong>Expertise:</strong> {formData.expertise}</p>
-          <p><strong>Skills:</strong> {formData.skill.join(", ")}</p>
-          <p><strong>University:</strong> {formData.university}</p>
-          <p><strong>Bsc:</strong> {formData.bsc}</p>
-          <p><strong>Msc:</strong> {formData.msc}</p>
-          <p><strong>PhD:</strong> {formData.phd}</p>
-          <p><strong>Academic Interests:</strong> {formData.academicInterests.join(", ")}</p>
-          <p><strong>Bio:</strong> {formData.bio}</p>
-          <p>
-            <strong>Address:</strong>{" "}
-            {formData.address.presentAddress}, {formData.address.city}, {formData.address.homeTown}
-          </p>
+        // Display mode (read-only)
+        <div className="space-y-3 text-gray-900 dark:text-gray-100">
+          <div className="flex justify-center mb-6">
+            <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden ring-4 ring-blue-300 dark:ring-blue-600 shadow-md bg-gradient-to-br from-white via-slate-100 to-slate-200 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+              <Image
+                src={previewUrl || "/default-avatar.png"}
+                alt="Profile"
+                layout="fill"
+                className="object-cover"
+              />
+            </div>
+          </div>
+
+          {[
+            ["Name", formData.name],
+            ["Email", formData.email],
+            ["Phone", formData.number],
+            ["Experience", formData.experience],
+            ["Expertise", formData.expertise],
+            ["Skills", formData.skill.join(", ")],
+            ["University", formData.university],
+            ["BSc", formData.bsc],
+            ["MSc", formData.msc],
+            ["PhD", formData.phd],
+            ["Academic Interests", formData.academicInterests.join(", ")],
+            ["Bio", formData.bio],
+            [
+              "Address",
+              `${formData.address.presentAddress}, ${formData.address.city}, ${formData.address.homeTown}`,
+            ],
+          ].map(([label, value]) => (
+            <p key={label}>
+              <strong>{label}:</strong> {value || <em className="text-gray-400">N/A</em>}
+            </p>
+          ))}
         </div>
       )}
     </Card>

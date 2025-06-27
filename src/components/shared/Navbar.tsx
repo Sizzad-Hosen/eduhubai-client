@@ -183,12 +183,12 @@ const handleLogout = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden px-4 pb-4 space-y-2 bg-white shadow-sm">
+        <div className="md:hidden pt-2 px-4 pb-4 space-y-2 bg-white font-bold  text-gray-900 shadow-sm">
           {navLinks.map((link) => (
            <Link
               key={link.href}
               href={link.href}
-              className={`relative flex items-center gap-1 text-sm font-medium text-white transition duration-300 group ${
+              className={`relative flex items-center gap-1 text-sm font-medium  transition duration-300 group ${
                 pathname === link.href ? "text-blue-400" : "hover:text-blue-400"
               }`}
             >
@@ -218,12 +218,25 @@ const handleLogout = () => {
               </button>
             </div>
         
-            <Link
-              href="/login"
-              className="block text-blue-600 text-sm font-medium py-2"
-            >
-              Login
-            </Link>
+            <div className="flex justify-between">
+              {/* notification */}
+            <Button variant="secondary" size="sm" asChild>
+                <Link href="/notification" className="flex items-center gap-1">
+                <Bell size={16} />
+
+                Notification
+              </Link>
+            </Button>
+        
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" variant="secondary" size="sm" asChild>
+              <Link href="/registration" className="flex items-center gap-1">
+                <UserCircle  className="h-4 w-4" size={16} />
+                Register
+              </Link>
+            </Button>
+
+            </div>
+            
       
         </div>
       )}

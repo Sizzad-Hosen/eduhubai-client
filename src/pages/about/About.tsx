@@ -30,7 +30,7 @@ const About = () => {
   if (loading) return <GlobalLoader />;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-cyan-50 via-white to-cyan-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 px-6 py-16">
+    <main className="bg-gradient-to-br from-cyan-100 via-white to-gray-800 dark:from-gray-900 dark:via-gray-900 dark:to-gray-900 px-6 py-16">
       <motion.div
         initial="hidden"
         animate="visible"

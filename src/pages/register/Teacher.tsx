@@ -224,9 +224,12 @@ const TeacherPage = () => {
             </div>
 
             <div className="md:col-span-2 text-center">
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
-                Register
-              </Button>
+             <Button
+                          type="submit"
+                          className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-10 py-3 rounded-xl shadow-lg transition"
+                        >
+                          Register
+                        </Button>
             </div>
           </form>
         </CardContent>

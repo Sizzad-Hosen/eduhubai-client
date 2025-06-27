@@ -115,7 +115,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 }
 
   return (
-    <div className="max-w-3xl mx-auto mt-10 p-4">
+    <div className="max-w-3xl mx-auto mt-10 p-4 ">
       <Card>
         <CardContent className="space-y-6 p-6">
           <h1 className="text-2xl font-semibold text-center">
@@ -228,9 +228,12 @@ const handleSubmit = async (e: React.FormEvent) => {
             </div>
 
             <div className="md:col-span-2 text-center">
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
-                Register
-              </Button>
+                <Button
+                             type="submit"
+                             className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-10 py-3 rounded-xl shadow-lg transition"
+                           >
+                             Register
+                           </Button>
             </div>
           </form>
         </CardContent>

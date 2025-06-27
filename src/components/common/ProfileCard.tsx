@@ -89,7 +89,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         </div>
 
         <div className="mt-4 flex justify-between">
-          <Button variant="outline" onClick={handleCardClick}>
+          <Button className=" text-white " variant="outline" onClick={handleCardClick}>
             Details
           </Button>
        

@@ -150,7 +150,7 @@ const handleLogout = () => {
             </DropdownMenu>
 
             {/* notification */}
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="secondary" size="sm" asChild>
                 <Link href="/notification" className="flex items-center gap-1">
                 <Bell size={16} />
 
@@ -158,9 +158,9 @@ const handleLogout = () => {
               </Link>
             </Button>
         
-            <Button variant="outline" size="sm" asChild>
+            <Button className="bg-emerald-600 hover:bg-emerald-700 text-white" variant="secondary" size="sm" asChild>
               <Link href="/registration" className="flex items-center gap-1">
-                <UserCircle size={16} />
+                <UserCircle  className="mr-2 h-4 w-4" size={16} />
                 Register
               </Link>
             </Button>

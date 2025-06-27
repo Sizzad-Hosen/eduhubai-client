@@ -63,7 +63,6 @@ const handleLogout = () => {
  
   const navLinks = [
     { name: "Home", href: "/", icon: <Home size={16} /> },
-    { name: "About", href: "/about", icon: <Info size={16} /> },
     { name: "Students", href: "/students", icon: <Users size={16} /> },
     { name: "Researchers", href: "/researchers", icon: <Users size={16} /> },
     { name: "Teachers", href: "/teachers", icon: <Users size={16} /> },

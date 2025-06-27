@@ -36,7 +36,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 }) => {
   const router = useRouter();
 // const [getReciverId] = useget
-
+console.log("id from hom page", id)
   const handleCardClick = () => {
     console.log("Navigating to  details:", id);
     router.push(`/${userType}/${id}`);

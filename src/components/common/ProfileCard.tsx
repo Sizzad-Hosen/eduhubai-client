@@ -62,7 +62,8 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 
 
   return (
-    <Card className="w-full max-w-md shadow-md hover:shadow-lg transition">
+    <Card  variant="gradient"
+    className="w-full max-w-md shadow-md hover:shadow-lg transition">
       <CardContent className="p-6">
         <div className="flex items-center gap-4 mb-4">
           <Avatar className="w-14 h-14">
@@ -71,11 +72,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           </Avatar>
           <div>
             <h2 className="text-lg font-semibold">{name}</h2>
-            <p className="text-sm text-muted-foreground">{email}</p>
+            <p className="text-sm text-white-700">{email}</p>
           </div>
         </div>
 
-        <div className="space-y-1 text-sm text-gray-700">
+        <div className="space-y-1 text-sm text-white-700">
           <p><span className="font-medium">University:</span> {university}</p>
           <p><span className="font-medium">Location:</span> {city}, {presentAddress}</p>
         </div>

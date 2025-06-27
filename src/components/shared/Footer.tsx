@@ -6,7 +6,7 @@ import { Facebook, Github, Linkedin } from "lucide-react"; // ✅ You must have 
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-300 py-8 mt-12">
+    <footer className="bg-slate-900 text-white shadow-md px-6   py-8 mt-12">
       <div className="container mx-auto px-4 flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0">
         
         {/* Logo Section */}

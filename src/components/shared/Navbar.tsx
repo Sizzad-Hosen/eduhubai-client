@@ -74,12 +74,13 @@ const handleLogout = () => {
 
   const { data } = useGetMEQuery({});
   
-  console.log("User Data:", data?.profileImg);
+
 
   return (
-    <nav className="border-b shadow-sm  bg-white sticky top-0 z-50">
+    <nav className="border-b bg-slate-900 font-bold text-white shadow-md top-0 z-50">
+
       <div className="container mx-auto px-4 py-5 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold text-blue-600">
+        <Link href="/" className="text-xl text-white font-bold ">
           <img 
           src={"https://i.postimg.cc/Qtw1MT39/logo-removebg-preview.png"} 
           width={120}
@@ -90,16 +91,24 @@ const handleLogout = () => {
         {/* Desktop Nav */}
         <div className="hidden md:flex gap-6 items-center">
           {navLinks.map((link) => (
-            <Link
+           <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-1 text-sm font-medium hover:text-blue-600 transition ${
-                pathname === link.href ? "text-blue-600" : "text-gray-700"
+              className={`relative flex items-center gap-1 text-sm font-medium text-white transition duration-300 group ${
+                pathname === link.href ? "text-blue-400" : "hover:text-blue-400"
               }`}
             >
               {link.icon}
               {link.name}
+
+              {/* Underline hover effect */}
+              <span
+                className={`absolute left-0 -bottom-1 h-0.5 w-0 bg-blue-400 transition-all duration-300 group-hover:w-full ${
+                  pathname === link.href ? "w-full" : ""
+                }`}
+              />
             </Link>
+
           ))}
 
           {/* Search Input */}
@@ -120,9 +129,6 @@ const handleLogout = () => {
                  
                     )
                   }
-
-
-          
                  
                   <AvatarFallback>SH</AvatarFallback>
                 </Avatar>
@@ -180,16 +186,24 @@ const handleLogout = () => {
       {isMenuOpen && (
         <div className="md:hidden px-4 pb-4 space-y-2 bg-white shadow-sm">
           {navLinks.map((link) => (
-            <Link
+           <Link
               key={link.href}
               href={link.href}
-              className={`block py-2 text-sm ${
-                pathname === link.href ? "text-blue-600 font-semibold" : "text-gray-700"
+              className={`relative flex items-center gap-1 text-sm font-medium text-white transition duration-300 group ${
+                pathname === link.href ? "text-blue-400" : "hover:text-blue-400"
               }`}
-              onClick={() => setIsMenuOpen(false)}
             >
+              {link.icon}
               {link.name}
+
+              {/* Underline hover effect */}
+              <span
+                className={`absolute left-0 -bottom-1 h-0.5 w-0 bg-emerald-400 transition-all duration-300 group-hover:w-full ${
+                  pathname === link.href ? "w-full" : ""
+                }`}
+              />
             </Link>
+
           ))}
           <Input placeholder="Search..." className="text-sm" />
        

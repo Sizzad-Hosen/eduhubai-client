@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Home,
   Users,
@@ -37,12 +37,26 @@ import { logout, selectCurrentUser } from "@/redux/features/auth/authSlice";
 import { useGetMEQuery } from "@/redux/features/userManagement/userMamagement.api";
 
 
-
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const dispatch = useDispatch();
+
+const handleLogout = () => {
+  // 1. Clear redux-persist data first (if needed)
+  localStorage.removeItem('persist:root'); 
+  localStorage.removeItem('token'); 
+
+  // 2. Dispatch redux logout to reset auth state
+  dispatch(logout());
+
+  // 3. Navigate to login page after state is updated
+  router.push('/login');
+};
+
+
   const auth = useAppSelector((state) => state.auth);
  const user = useAppSelector(selectCurrentUser);
  console.log("User in Navbar:", user);
@@ -126,7 +140,7 @@ export default function Navbar() {
                 >
                   <LogOut size={16} />
                      <button
-                onClick={() => dispatch(logout())}
+                onClick={handleLogout}
                 className="text-sm text-left text-red-600 py-1"
               >
                 Logout
@@ -145,9 +159,9 @@ export default function Navbar() {
             </Button>
         
             <Button variant="outline" size="sm" asChild>
-              <Link href="/login" className="flex items-center gap-1">
-                <LogIn size={16} />
-                Login
+              <Link href="/registration" className="flex items-center gap-1">
+                <UserCircle size={16} />
+                Register
               </Link>
             </Button>
       
@@ -184,7 +198,7 @@ export default function Navbar() {
                 Dashboard
               </Link>
               <button
-                onClick={() => dispatch(logout())}
+                onClick={handleLogout}
                 className="text-sm text-left text-red-600 py-1"
               >
                 Logout

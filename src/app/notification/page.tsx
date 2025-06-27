@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
 import GlobalLoader from "@/components/common/GlobalLoader";
 import toast from "react-hot-toast";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const ReceivedNotifications = () => {
   const {
@@ -49,6 +50,9 @@ const ReceivedNotifications = () => {
     );
 
   return (
+
+
+    <ProtectedRoute>
     <div className="p-6 max-w-3xl mx-auto">
       <h1 className="text-2xl font-bold mb-4 text-blue-600">
         Received Connection Requests
@@ -115,6 +119,7 @@ const ReceivedNotifications = () => {
         )}
       </ul>
     </div>
+    </ProtectedRoute>
   );
 };
 

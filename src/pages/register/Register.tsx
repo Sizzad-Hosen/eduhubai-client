@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import GlobalLoader from "@/components/common/GlobalLoader";
+import Link from "next/link";
 
 export default function Register() {
   const router = useRouter();
@@ -37,6 +38,10 @@ export default function Register() {
           Register as Researcher
         </Button>
       </div>
+
+      <p className="text-xl font-bold">Already have an account ? 
+        <Link className="text-cyan-500" href={"/login"}> Login</Link>
+      </p>
     </div>
   );
 }

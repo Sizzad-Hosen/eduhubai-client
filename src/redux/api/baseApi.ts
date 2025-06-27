@@ -26,8 +26,8 @@ const baseQueryWithRefreshToken = async (args: any, api: any, extraOptions: any)
       extraOptions
     );
     
-    console.log('Current token:', (api.getState() as RootState).auth.token);
-    console.log('Refresh result:', refreshResult);
+    // console.log('Current token:', (api.getState() as RootState).auth.token);
+    // console.log('Refresh result:', refreshResult);
 
     if (refreshResult.data) {
       const { data } = refreshResult.data as { data?: { accessToken: string } };

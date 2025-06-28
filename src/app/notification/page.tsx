@@ -12,6 +12,7 @@ import { formatDistanceToNow } from "date-fns";
 import GlobalLoader from "@/components/common/GlobalLoader";
 import toast from "react-hot-toast";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import { Bell } from "lucide-react";
 
 const ReceivedNotifications = () => {
   const {
@@ -40,85 +41,84 @@ const ReceivedNotifications = () => {
   };
 
   if (requestsLoading || sentLoading) return <GlobalLoader />;
-  if (requestsError)
+  if (requestsError || sentError)
     return (
-      <p className="text-center text-red-500">Failed to load received requests.</p>
-    );
-  if (sentError)
-    return (
-      <p className="text-center text-red-500">Failed to load sent requests.</p>
+      <div className="flex items-center justify-center h-48 text-red-600 font-medium">
+        🚫 Failed to load notifications.
+      </div>
     );
 
   return (
-
-
     <ProtectedRoute>
-    <div className="p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-blue-600">
-        Received Connection Requests
-      </h1>
+      <div className="max-w-4xl mx-auto p-6 bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen rounded-xl shadow-md">
+        <h1 className="text-3xl font-bold text-center text-blue-700 mb-6 flex items-center justify-center gap-2">
+          <Bell className="text-blue-500" /> All Notifications
+        </h1>
 
-      <ul className="mb-6">
-        {requestsData?.data?.length ? (
-          requestsData.data.map((req) => (
-            <li
-              key={req.receiverId._id}
-              className="bg-green-50 p-3 rounded shadow text-sm text-gray-800"
-            >
-              ✅ <strong>{req.receiverId.name}</strong> has{" "}
-              <span className="font-medium text-green-700">{req.status}</span>{" "}
-              your request.
-            </li>
-          ))
-        ) : (
-          <li className="text-center text-gray-400">No confirmed requests yet.</li>
-        )}
-      </ul>
+        {/* ✅ Confirmed Requests */}
+        <div className="mb-6 space-y-2">
+          {requestsData?.data?.length ? (
+            requestsData.data.map((req) => (
+              <div
+                key={req.receiverId._id}
+                className="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded-md text-sm shadow-sm"
+              >
+                ✅ <strong>{req.receiverId.name}</strong> has{" "}
+                <span className="font-semibold">{req.status}</span> your request.
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No confirmed requests yet.</p>
+          )}
+        </div>
 
-      <ul className="space-y-4">
-        {requests.length ? (
-          requests.map((req: any) => (
-            <li
-              key={req._id}
-              className="flex items-center justify-between bg-white p-4 rounded-lg shadow-md"
-            >
-              <div className="flex items-center gap-4">
-                <Avatar>
-                  <AvatarImage src={req.senderId?.profileImg || "/default-avatar.png"} />
-                  <AvatarFallback>
-                    {req.senderId?.name?.charAt(0) || "U"}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-semibold">{req.senderId?.name}</p>
-                  <p className="text-sm text-gray-500">
-                    Sent {formatDistanceToNow(new Date(req.createdAt))} ago
-                  </p>
+        {/* 🔄 Pending Requests */}
+        <div className="space-y-4">
+          {requests.length ? (
+            requests.map((req: any) => (
+              <div
+                key={req._id}
+                className="flex items-center justify-between bg-white/70 border border-gray-200 p-4 rounded-xl shadow-sm backdrop-blur-md hover:shadow-md transition"
+              >
+                <div className="flex items-center gap-4">
+                  <Avatar>
+                    <AvatarImage src={req.senderId?.profileImg || "/default-avatar.png"} />
+                    <AvatarFallback>
+                      {req.senderId?.name?.charAt(0) || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      {req.senderId?.name}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Sent {formatDistanceToNow(new Date(req.createdAt))} ago
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => handleUpdate(req._id, "accepted")}
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => handleUpdate(req._id, "rejected")}
+                  >
+                    Reject
+                  </Button>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => handleUpdate(req._id, "accepted")}
-                >
-                  Accept
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => handleUpdate(req._id, "rejected")}
-                >
-                  Reject
-                </Button>
-              </div>
-            </li>
-          ))
-        ) : (
-          <p className="text-center text-gray-500">No new requests.</p>
-        )}
-      </ul>
-    </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500 mt-8">No new requests found.</p>
+          )}
+        </div>
+      </div>
     </ProtectedRoute>
   );
 };

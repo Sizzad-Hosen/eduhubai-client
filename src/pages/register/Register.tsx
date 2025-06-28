@@ -27,7 +27,7 @@ export default function Register() {
     <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-900 via-slate-900 to-gray-900 px-4 py-12 relative overflow-hidden">
       {/* ✈️ 100 Airplanes flying across screen */}
       {airplanes.map((_, i) => {
-        const delay = Math.random() * 15; // Delay between 0 and 15s
+        const delay = Math.random() * 10; // Delay between 0 and 15s
         const duration = 20 + Math.random() * 10; // Duration between 20 and 30s (slow)
         const top = Math.random() * 90 + 5; // Top position between 5vh and 95vh for good spread
 

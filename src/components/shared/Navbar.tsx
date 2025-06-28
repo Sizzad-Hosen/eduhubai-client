@@ -132,26 +132,31 @@ const handleLogout = () => {
                   <AvatarFallback>SH</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard" className="flex items-center gap-2">
-                    <LayoutDashboard size={16} />
-                    Dashboard
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                 
-                  className="flex items-center gap-2"
-                >
-                  <LogOut size={16} />
-                     <button
-                onClick={handleLogout}
-                className="text-sm text-left text-red-600 py-1"
-              >
-                Logout
-              </button>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
+          <DropdownMenuContent 
+  className="bg-white w-48 p-1 rounded-md shadow-lg" 
+  align="end"
+>
+ <DropdownMenuItem className="p-0 hover:bg-transparent">
+  <Link
+    href="/dashboard"
+    className="flex items-center gap-2 px-2 py-1.5 w-full rounded-sm text-sm font-medium hover:bg-blue-500 hover:text-white transition-colors duration-200"
+  >
+    <LayoutDashboard size={16} />
+    Dashboard
+  </Link>
+</DropdownMenuItem>
+  
+  <DropdownMenuItem className="p-0">
+    <button
+      onClick={handleLogout}
+      className="flex items-center gap-2 w-full px-2 py-1.5 rounded-sm text-sm font-medium text-red-600 hover:bg-red-500 hover:text-white transition-colors duration-200 ease-in-out"
+    >
+      <LogOut size={16} />
+      Logout
+    </button>
+  </DropdownMenuItem>
+</DropdownMenuContent>
+          
             </DropdownMenu>
 
             {/* notification */}

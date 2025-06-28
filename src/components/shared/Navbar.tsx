@@ -16,6 +16,7 @@ import {
   Info,
   Bell,
   ChartBarStackedIcon,
+  Bot,
 } from "lucide-react";
 import {
   Avatar,
@@ -66,7 +67,7 @@ const handleLogout = () => {
     { name: "Students", href: "/students", icon: <Users size={16} /> },
     { name: "Researchers", href: "/researchers", icon: <Users size={16} /> },
     { name: "Teachers", href: "/teachers", icon: <Users size={16} /> },
-    { name: "AIAssistance", href: "/research-assistant", icon: <ChartBarStackedIcon size={16} /> },
+    { name: "AIAssistance", href: "/research-assistant", icon: <Bot size={16} /> },
    
   
   ];

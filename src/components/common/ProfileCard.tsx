@@ -96,6 +96,14 @@ console.log("id from hom page", id)
             Details
           </Button>
        
+         <div  className="bg-blue-600 text-white rounded-2xl hover:bg-green-700">
+        
+          <Button variant="default" onClick={() => handleConnect(id)}>
+            Send Message
+          </Button>
+          
+         </div>
+       
          <div  className="bg-green-600 text-white rounded-2xl hover:bg-green-700">
         
           <Button variant="default" onClick={() => handleConnect(id)}>

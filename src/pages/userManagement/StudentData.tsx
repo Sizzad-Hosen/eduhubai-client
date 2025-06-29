@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useGetAllStudentsQuery } from "@/redux/features/userManagement/userMamagement.api";
 import ProfileCard from "@/components/common/ProfileCard";
 import { Button } from "@/components/ui/button";
@@ -14,32 +14,47 @@ const StudentsDataPage = () => {
   const [page, setPage] = useState(1);
   const limit = 6;
 
-  const { data: studentData, isLoading, isFetching } = useGetAllStudentsQuery([
-    { name: "page", value: page },
-    { name: "limit", value: limit },
-    { name: "sort", value: "id" },
-    ...params,
-  ]);
+  // Memoized queryParams to prevent unnecessary re-fetching
+  const queryParams = useMemo(() => {
+    return [
+      { name: "page", value: page },
+      { name: "limit", value: limit },
+      { name: "sort", value: "id" },
+      ...params,
+    ];
+  }, [page, params]);
 
-  const students = studentData?.data || [];
+  const {
+    data: studentData,
+    isLoading,
+    isFetching,
+    error,
+  } = useGetAllStudentsQuery(queryParams);
 
-  console.log("Students Data:", students);
-  const total = studentData?.meta?.total || 0;
-  const totalPages = Math.ceil(total / limit);
+  const students = studentData?.data?.data || [];
+  const total = studentData?.data?.meta?.total || 0;
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+
+  const handleSearch = (filters: Record<string, string | number>) => {
+    const newParams = Object.entries(filters).map(([name, value]) => ({
+      name,
+      value,
+    }));
+    setParams(newParams);
+    setPage(1); // Reset to page 1 on new search
+  };
 
   return (
     <div className="p-6 space-y-6 min-h-[70vh]">
       <SearchBar
         searchableFields={studentSearchableFields}
-        onSearch={(filters) =>
-          setParams(
-            Object.entries(filters).map(([name, value]) => ({ name, value }))
-          )
-        }
+        onSearch={handleSearch}
       />
 
       {isLoading ? (
-       <GlobalLoader></GlobalLoader>
+        <GlobalLoader />
+      ) : error ? (
+        <p className="text-red-500 text-center">Something went wrong!</p>
       ) : (
         <>
           <div className="grid grid-cols-1 p-5 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -66,6 +81,7 @@ const StudentsDataPage = () => {
             )}
           </div>
 
+          {/* Pagination */}
           <div className="flex justify-center items-center gap-4 mt-8">
             <Button
               variant="outline"
@@ -79,7 +95,7 @@ const StudentsDataPage = () => {
             </span>
             <Button
               variant="outline"
-              onClick={() => setPage((prev) => prev + 1)}
+              onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
               disabled={page >= totalPages || isFetching}
             >
               Next

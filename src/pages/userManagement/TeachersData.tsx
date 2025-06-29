@@ -21,8 +21,8 @@ const TeachersDataPage = () => {
     ...params,
   ]);
 
-  const teachers = teachersData?.data || [];
-  const total = teachersData?.meta?.total || 0;
+  const teachers = teachersData?.data?.data || [];
+  const total = teachersData?.data?.meta?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
   return (

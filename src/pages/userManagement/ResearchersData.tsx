@@ -21,8 +21,8 @@ const ResearchersDataPage = () => {
     ...params,
   ]);
 
-  const researchers = researchersData?.data || [];
-  const total = researchersData?.meta?.total || 0;
+  const researchers = researchersData?.data?.data || [];
+  const total = researchersData?.data?.meta?.total || 0;
   const totalPages = Math.ceil(total / limit);
 
   return (

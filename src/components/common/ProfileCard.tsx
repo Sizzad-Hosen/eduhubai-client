@@ -58,10 +58,14 @@ console.log("id from hom page", id)
     }
 
   } catch (error) {
-    toast.error("Something went wrong or already sent a request");
+    toast.error(" Already sent a request");
   }
 };
 
+const  handleMessage = async()=>{
+ router.push(`/chat/${id}`)
+
+}
 
   return (
     <Card  variant="gradient"
@@ -98,7 +102,7 @@ console.log("id from hom page", id)
        
          <div  className="bg-blue-600 text-white rounded-2xl hover:bg-green-700">
         
-          <Button variant="default" onClick={() => handleConnect(id)}>
+          <Button variant="ghost" onClick={() => handleMessage(id)}>
             Send Message
           </Button>
           

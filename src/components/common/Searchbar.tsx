@@ -15,15 +15,40 @@ interface SearchBarProps {
 const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchableFields }) => {
   const [formData, setFormData] = useState<Record<string, string>>({});
 
+  // Map frontend search fields to actual database fields (dot notation if nested)
+  const fieldMapping: Record<string, string> = {
+    location: "address.location",
+    city: "address.city",
+    academicInterests: "academicInterests",
+    course: "course",
+    skill: "skills",
+    email: "email",
+    name: "name",
+    experience: "experience",
+    // Add more mappings as needed
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSearch = () => {
+    // Filter out empty inputs
     const filtered = Object.fromEntries(
       Object.entries(formData).filter(([_, v]) => v.trim() !== "")
     );
-    onSearch(filtered);
+
+    // Map keys to actual DB field names for the query
+    const mappedFilters = Object.entries(filtered).reduce(
+      (acc, [key, value]) => {
+        const mappedKey = fieldMapping[key] || key;
+        acc[mappedKey] = value;
+        return acc;
+      },
+      {} as Record<string, string>
+    );
+
+    onSearch(mappedFilters);
   };
 
   return (
@@ -46,9 +71,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, searchableFields }) => 
       <Card className="p-4 sm:p-6 mx-auto w-full max-w-screen-sm sm:max-w-screen-md md:max-w-screen-lg lg:max-w-screen-xl xl:max-w-screen-2xl mb-6 sm:mb-8 border border-gray-200 shadow-lg bg-gradient-to-br from-blue-100 via-white to-purple-100">
         <CardContent className="space-y-4 sm:space-y-6">
           <ScrollArea className="w-full max-h-[280px] sm:max-h-[280px] md:max-h-[320px] lg:max-h-[360px] xl:max-h-[400px] rounded-md border border-gray-300 bg-white/70 backdrop-blur-md shadow-inner">
-        
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 px-3 py-3 sm:px-4 sm:py-4">
-              
               {searchableFields.map((field) => (
                 <motion.div
                   key={field}

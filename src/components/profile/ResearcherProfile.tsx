@@ -10,12 +10,13 @@ import Image from "next/image";
 import { useUpdateResearcherMutation } from "@/redux/features/userManagement/userMamagement.api";
 import GlobalLoader from "../common/GlobalLoader";
 
-const ResearcherProfile = ({ data }: { data: any }) => {
+const ResearcherProfile = ({ data }) => {
   const [updateResearcher, { isLoading }] = useUpdateResearcherMutation();
   const [editMode, setEditMode] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [skillInput, setSkillInput] = useState("");
-  const [previewUrl, setPreviewUrl] = useState<string | null>(data.profileImg || null);
+  const [previewUrl, setPreviewUrl] = useState(data.profileImg || null);
+  const [errors, setErrors] = useState({});
 
   const [formData, setFormData] = useState({
     name: data.name || "",
@@ -43,16 +44,17 @@ const ResearcherProfile = ({ data }: { data: any }) => {
     },
   });
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.length) {
-      const file = e.target.files[0];
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
+    setErrors({ ...errors, [name]: "" });
     if (["city", "homeTown", "presentAddress"].includes(name)) {
       setFormData((prev) => ({
         ...prev,
@@ -69,7 +71,19 @@ const ResearcherProfile = ({ data }: { data: any }) => {
     }
   };
 
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.number.trim()) newErrors.number = "Phone number is required";
+    if (formData.skill.length === 0) newErrors.skill = "Add at least one skill";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSave = async () => {
+    if (!validate()) return;
+
     try {
       const payload = {
         ...formData,
@@ -82,33 +96,30 @@ const ResearcherProfile = ({ data }: { data: any }) => {
         formDataToSend.append("file", selectedFile);
       }
 
-      const response = await updateResearcher({
-        id: data._id,
-        data: formDataToSend,
-      }).unwrap();
+      const response = await updateResearcher({ id: data._id, data: formDataToSend }).unwrap();
 
       setFormData({
         ...response,
-        researchPaper: response.researchPaper || { title: "", link: "" },
+        researchPaper: response.researchPaper?.[0] || { title: "", link: "" },
         address: response.address || { city: "", homeTown: "", presentAddress: "" },
       });
 
       setPreviewUrl(response.profileImg || null);
       toast.success("Profile updated successfully");
       setEditMode(false);
-    } catch (err: any) {
+    } catch (err) {
       toast.error("Failed to update: " + err.message);
     }
   };
 
-  const removeSkill = (skill: string) => {
+  const removeSkill = (skill) => {
     setFormData((prev) => ({
       ...prev,
       skill: prev.skill.filter((s) => s !== skill),
     }));
   };
 
-  const handleSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleSkillKeyDown = (e) => {
     if (e.key === "Enter" && skillInput.trim()) {
       e.preventDefault();
       if (!formData.skill.includes(skillInput.trim())) {
@@ -124,8 +135,8 @@ const ResearcherProfile = ({ data }: { data: any }) => {
   if (isLoading) return <GlobalLoader />;
 
   return (
-    <Card className="p-6 sm:p-8 max-w-4xl mx-auto rounded-2xl shadow-xl border border-slate-200 bg-gradient-to-br from-white via-blue-50 to-sky-100 dark:from-slate-800 dark:via-slate-900 dark:to-slate-950 transition-all duration-500 space-y-6">
-      <div className="flex justify-end items-center">
+    <Card className="p-6 sm:p-8 max-w-4xl mx-auto rounded-2xl border border-slate-300 bg-white dark:bg-slate-900">
+      <div className="flex justify-end">
         <Button variant="outline" onClick={() => setEditMode(!editMode)}>
           {editMode ? "Cancel" : "Edit"}
         </Button>
@@ -134,38 +145,28 @@ const ResearcherProfile = ({ data }: { data: any }) => {
       {editMode ? (
         <form className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {/* Avatar */}
-          <div className="sm:col-span-2 flex justify-center mb-4">
-            <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-4 border-white shadow ring-4 ring-blue-300 dark:ring-blue-600">
-              {previewUrl && <Image src={previewUrl} alt="Profile" layout="fill" className="object-cover" />}
+          <div className="sm:col-span-2 flex justify-center">
+            <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden">
+              {previewUrl && <Image src={previewUrl} alt="Profile" fill className="object-cover" />}
             </div>
           </div>
           <div className="sm:col-span-2">
-            <label className="block font-medium mb-2">Profile Picture</label>
+            <label>Profile Picture</label>
             <Input type="file" accept="image/*" onChange={handleFileChange} />
           </div>
 
-          {/* Main fields */}
-          {[
-            ["name", "Name"],
-            ["email", "Email"],
-            ["number", "Phone"],
-            ["experience", "Experience"],
-            ["expertise", "Expertise"],
-            ["currentlyWorkingAt", "Currently Working At"],
-            ["bsc", "BSc"],
-            ["msc", "MSc"],
-            ["phd", "PhD"],
-            ["researchArea", "Research Area"],
-          ].map(([name, label]) => (
+          {/* Text Inputs */}
+          {["name", "email", "number", "experience", "expertise", "currentlyWorkingAt", "bsc", "msc", "phd", "researchArea"].map((name) => (
             <div key={name}>
-              <label className="block mb-1">{label}</label>
-              <Input name={name} value={(formData as any)[name]} onChange={handleChange} />
+              <label>{name.charAt(0).toUpperCase() + name.slice(1)}</label>
+              <Input name={name} value={formData[name]} onChange={handleChange} className={errors[name] && "border-red-500"} />
+              {errors[name] && <p className="text-red-500 text-sm mt-1">{errors[name]}</p>}
             </div>
           ))}
 
-          {/* Research Paper Title and Link */}
+          {/* Research Paper */}
           <div>
-            <label className="block mb-1">Research Paper Title</label>
+            <label>Research Paper Title</label>
             <Input
               name="researchPaperTitle"
               value={formData.researchPaper.title}
@@ -178,7 +179,7 @@ const ResearcherProfile = ({ data }: { data: any }) => {
             />
           </div>
           <div>
-            <label className="block mb-1">Research Paper Link</label>
+            <label>Research Paper Link</label>
             <Input
               name="researchPaperLink"
               value={formData.researchPaper.link}
@@ -193,29 +194,22 @@ const ResearcherProfile = ({ data }: { data: any }) => {
 
           {/* Academic Interests */}
           <div className="sm:col-span-2">
-            <label className="block mb-1">Academic Interests (comma-separated)</label>
+            <label>Academic Interests</label>
             <Input
               name="academicInterests"
               value={formData.academicInterests.join(",")}
-              onChange={(e) =>
-                setFormData({ ...formData, academicInterests: e.target.value.split(",") })
-              }
+              onChange={(e) => setFormData({ ...formData, academicInterests: e.target.value.split(",") })}
             />
           </div>
 
           {/* Skills */}
           <div className="sm:col-span-2">
-            <label className="block mb-1 font-medium">Skills</label>
-            <div className="flex flex-wrap gap-2 border rounded-lg p-3 min-h-[48px] bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700 shadow-sm">
+            <label>Skills</label>
+            <div className="flex flex-wrap gap-2 p-2 border rounded-md bg-white dark:bg-slate-800">
               {formData.skill.map((skill) => (
-                <div
-                  key={skill}
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-3 py-1 rounded-full flex items-center gap-2 text-sm shadow"
-                >
-                  <span>{skill}</span>
-                  <button type="button" onClick={() => removeSkill(skill)} aria-label={`Remove skill ${skill}`} className="hover:text-gray-300 focus:outline-none">
-                    &times;
-                  </button>
+                <div key={skill} className="px-3 py-1 bg-blue-600 text-white rounded-full text-sm">
+                  {skill}
+                  <button type="button" onClick={() => removeSkill(skill)} className="ml-2">&times;</button>
                 </div>
               ))}
               <input
@@ -223,89 +217,72 @@ const ResearcherProfile = ({ data }: { data: any }) => {
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
                 onKeyDown={handleSkillKeyDown}
-                className="flex-grow outline-none bg-transparent text-sm placeholder:text-gray-400 dark:placeholder:text-gray-600"
-                placeholder="Type skill and press Enter"
+                placeholder="Type skill & press Enter"
+                className="flex-1 outline-none bg-transparent"
               />
             </div>
+            {errors.skill && <p className="text-red-500 text-sm mt-1">{errors.skill}</p>}
           </div>
 
           {/* Bio */}
           <div className="sm:col-span-2">
-            <label className="block mb-1">Bio</label>
+            <label>Bio</label>
             <Textarea name="bio" value={formData.bio} onChange={handleChange} />
           </div>
 
           {/* Address */}
-          {[
-            ["city", "City"],
-            ["homeTown", "Home Town"],
-            ["presentAddress", "Present Address"],
-          ].map(([name, label]) => (
-            <div key={name} className={name === "presentAddress" ? "sm:col-span-2" : ""}>
-              <label className="block mb-1">{label}</label>
-              <Input name={name} value={(formData.address as any)[name]} onChange={handleChange} />
+          {["city", "homeTown", "presentAddress"].map((field) => (
+            <div key={field} className={field === "presentAddress" ? "sm:col-span-2" : ""}>
+              <label>{field.charAt(0).toUpperCase() + field.slice(1)}</label>
+              <Input
+                name={field}
+                value={formData.address[field]}
+                onChange={handleChange}
+              />
             </div>
           ))}
 
           <div className="sm:col-span-2 flex justify-center">
-            <Button
-              type="button"
-              onClick={handleSave}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-xl font-medium shadow-md transition"
-            >
+            <Button onClick={handleSave} className="bg-blue-600 text-white px-6 py-2 rounded-md">
               Save Changes
             </Button>
           </div>
         </form>
       ) : (
-        <div className="space-y-3 text-gray-900 dark:text-gray-100">
-          <div className="flex justify-center mb-6">
+        <div className="space-y-3">
+          <div className="flex justify-center">
             <Image
               src={previewUrl || "/placeholder-profile.png"}
               alt="Profile"
               width={128}
               height={128}
-              className="rounded-full overflow-hidden border-4 border-white shadow-md ring-2 ring-blue-200 dark:ring-blue-500 bg-gradient-to-br from-white via-slate-100 to-slate-200 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800"
+              className="rounded-full"
             />
           </div>
-          {[
-            ["Name", formData.name],
-            ["Email", formData.email],
-            ["Phone", formData.number],
-            ["Experience", formData.experience],
-            ["Expertise", formData.expertise],
-            ["Skills", formData.skill.join(", ")],
-            ["Currently Working At", formData.currentlyWorkingAt],
-            ["BSc", formData.bsc],
-            ["MSc", formData.msc],
-            ["PhD", formData.phd],
-            ["Academic Interests", formData.academicInterests.join(", ")],
-            ["Bio", formData.bio],
-            ["Research Area", formData.researchArea],
-            [
-              "Research Paper",
-              formData.researchPaper.title ? (
-                <a
-                  href={formData.researchPaper.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline hover:text-blue-800"
-                >
-                  {formData.researchPaper.title}
-                </a>
-              ) : (
-                "N/A"
-              ),
-            ],
-            [
-              "Address",
-              `${formData.address.presentAddress}, ${formData.address.city}, ${formData.address.homeTown}`,
-            ],
-          ].map(([label, value]) => (
-            <p key={label as string} className="text-sm sm:text-base">
-              <strong>{label}:</strong> {value}
+          {["name", "email", "number", "experience", "expertise", "currentlyWorkingAt", "bsc", "msc", "phd", "bio", "researchArea"].map((field) => (
+            <p key={field}>
+              <strong>{field.charAt(0).toUpperCase() + field.slice(1)}:</strong> {formData[field] || "N/A"}
             </p>
           ))}
+          <p>
+            <strong>Skills:</strong> {formData.skill.join(", ") || "N/A"}
+          </p>
+          <p>
+            <strong>Academic Interests:</strong> {formData.academicInterests.join(", ") || "N/A"}
+          </p>
+          <p>
+            <strong>Research Paper:</strong>{" "}
+            {formData.researchPaper.title ? (
+              <a href={formData.researchPaper.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                {formData.researchPaper.title}
+              </a>
+            ) : (
+              "N/A"
+            )}
+          </p>
+          <p>
+            <strong>Address:</strong> {`${formData.address.presentAddress}, ${formData.address.city}, ${formData.address.homeTown}` || "N/A"}
+          </p>
         </div>
       )}
     </Card>

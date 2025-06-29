@@ -85,7 +85,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     if (res.success) {
 
       toast.success("Registration successful!");
-      router.push("/"); 
+      router.push("/login"); 
     } else {
       toast.error(res.message || "Something went wrong");
     }

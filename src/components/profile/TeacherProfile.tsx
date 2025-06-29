@@ -10,17 +10,12 @@ import Image from "next/image";
 import { useUpdateTeacherMutation } from "@/redux/features/userManagement/userMamagement.api";
 
 const TeacherProfile = ({ data }: { data: any }) => {
-  // State to toggle edit mode
   const [editMode, setEditMode] = useState(false);
-
-  // Store selected profile image file for upload & preview URL
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(data.profileImg || null);
-
-  // Skill input (for adding new skill on Enter)
   const [skillInput, setSkillInput] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Local copy of data for editing
   const [formData, setFormData] = useState({
     name: data.name || "",
     email: data.email || "",
@@ -43,16 +38,30 @@ const TeacherProfile = ({ data }: { data: any }) => {
 
   const [updateTeacher] = useUpdateTeacherMutation();
 
-  // Handle profile picture file selection & preview
+  // Validation function
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+    if (!formData.name.trim()) newErrors.name = "Name is required.";
+    if (!formData.email.trim()) newErrors.email = "Email is required.";
+    else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email.trim()))
+      newErrors.email = "Invalid email address.";
+    if (!formData.number.trim()) newErrors.number = "Phone number is required.";
+    if (!formData.expertise.trim()) newErrors.expertise = "Expertise is required.";
+    if (!formData.university.trim()) newErrors.university = "University is required.";
+    if (formData.skill.length === 0) newErrors.skill = "Please add at least one skill.";
+    if (!formData.address.city.trim()) newErrors.city = "City is required.";
+    if (!formData.address.homeTown.trim()) newErrors.homeTown = "Home Town is required.";
+    if (!formData.address.presentAddress.trim()) newErrors.presentAddress = "Present Address is required.";
+    return newErrors;
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setSelectedFile(e.target.files[0]);
-      const fileUrl = URL.createObjectURL(e.target.files[0]);
-      setPreviewUrl(fileUrl);
+      setPreviewUrl(URL.createObjectURL(e.target.files[0]));
     }
   };
 
-  // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
 
@@ -64,23 +73,42 @@ const TeacherProfile = ({ data }: { data: any }) => {
           [name]: value,
         },
       }));
+    } else if (name === "academicInterests") {
+      setFormData((prev) => ({
+        ...prev,
+        academicInterests: value.split(",").map((s) => s.trim()),
+      }));
     } else {
       setFormData((prev) => ({
         ...prev,
         [name]: value,
       }));
     }
+
+    if (errors[name]) {
+      setErrors((prev) => {
+        const copy = { ...prev };
+        delete copy[name];
+        return copy;
+      });
+    }
   };
 
-  // Remove a skill tag
   const removeSkill = (skill: string) => {
     setFormData((prev) => ({
       ...prev,
       skill: prev.skill.filter((s) => s !== skill),
     }));
+
+    if (errors.skill && formData.skill.length > 1) {
+      setErrors((prev) => {
+        const copy = { ...prev };
+        delete copy.skill;
+        return copy;
+      });
+    }
   };
 
-  // Add skill on Enter keypress
   const handleSkillKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter" && skillInput.trim()) {
       event.preventDefault();
@@ -91,21 +119,28 @@ const TeacherProfile = ({ data }: { data: any }) => {
         }));
       }
       setSkillInput("");
+      if (errors.skill) {
+        setErrors((prev) => {
+          const copy = { ...prev };
+          delete copy.skill;
+          return copy;
+        });
+      }
     }
   };
 
-  // Save updated data handler
   const handleSave = async () => {
-    try {
-      const payload = {
-        ...formData,
-        skill: formData.skill,
-        academicInterests: formData.academicInterests,
-      };
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      toast.error("Please fix errors before saving.");
+      return;
+    }
 
+    try {
+      const payload = { ...formData };
       const formDataToSend = new FormData();
       formDataToSend.append("data", JSON.stringify(payload));
-
       if (selectedFile) {
         formDataToSend.append("file", selectedFile);
       }
@@ -117,7 +152,6 @@ const TeacherProfile = ({ data }: { data: any }) => {
 
       const response = await updateTeacher(updatedTeacherData).unwrap();
 
-      // Update local state with response
       setFormData({
         name: response.name || "",
         email: response.email || "",
@@ -139,31 +173,30 @@ const TeacherProfile = ({ data }: { data: any }) => {
       });
 
       setPreviewUrl(response.profileImg || null);
-
       toast.success("Profile updated successfully");
       setEditMode(false);
+      setErrors({});
     } catch (err: any) {
-      toast.error("Failed to update profile: " + err.message);
+      toast.error("Failed to update profile: " + (err?.message || "Unknown error"));
     }
   };
 
   return (
     <Card className="w-full max-w-5xl mx-auto px-4 py-6 md:p-8 rounded-2xl shadow-lg border bg-gradient-to-br from-white via-sky-50 to-sky-100 dark:from-slate-800 dark:via-slate-900 dark:to-slate-950 space-y-6">
       <div className="flex justify-end items-center">
-        
         <Button variant="outline" onClick={() => setEditMode(!editMode)}>
           {editMode ? "Cancel" : "Edit"}
         </Button>
       </div>
 
       {editMode ? (
-        <form className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+        <form className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full" onSubmit={(e) => e.preventDefault()}>
           {/* Profile Picture */}
           <div className="md:col-span-2 space-y-2">
             {previewUrl && (
               <div className="flex justify-center mt-2">
                 <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden ring-4 ring-blue-300 dark:ring-blue-600 shadow-md bg-gradient-to-br from-white via-slate-100 to-slate-200 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
-                  <Image src={previewUrl} alt="Profile Picture" layout="fill" className="object-cover" />
+                  <Image src={previewUrl} alt="Profile Picture" fill className="object-cover" />
                 </div>
               </div>
             )}
@@ -188,27 +221,48 @@ const TeacherProfile = ({ data }: { data: any }) => {
             ["msc", "MSc"],
             ["phd", "PhD"],
           ].map(([name, label]) => (
-            <div key={name}>
-              <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">{label}</label>
-              <Input name={name} value={(formData as any)[name]} onChange={handleChange} />
+            <div key={name} className="relative">
+              <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">
+                {label}{" "}
+                {["name", "email", "number", "expertise", "university"].includes(name) && (
+                  <span className="text-red-500">*</span>
+                )}
+              </label>
+              <Input
+                name={name}
+                value={(formData as any)[name]}
+                onChange={handleChange}
+                className={`border rounded-md bg-white dark:bg-gray-800 focus:ring-blue-500 focus:border-blue-500 transition ${
+                  errors[name] ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                }`}
+                type={name === "email" ? "email" : "text"}
+              />
+              {errors[name] && (
+                <p className="text-red-600 text-sm mt-1" role="alert" aria-live="assertive">
+                  {errors[name]}
+                </p>
+              )}
             </div>
           ))}
 
           {/* Academic Interests */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 relative">
             <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">
               Academic Interests (comma separated)
             </label>
             <Input
               name="academicInterests"
-              value={formData.academicInterests.join(",")}
-              onChange={(e) => setFormData({ ...formData, academicInterests: e.target.value.split(",") })}
+              value={formData.academicInterests.join(", ")}
+              onChange={handleChange}
+              className="border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:ring-blue-500 focus:border-blue-500 transition"
             />
           </div>
 
           {/* Skills */}
-          <div className="md:col-span-2">
-            <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">Skills</label>
+          <div className="md:col-span-2 relative">
+            <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">
+              Skills <span className="text-red-500">*</span>
+            </label>
             <div className="flex flex-wrap gap-2 border rounded-lg p-3 min-h-[48px] bg-white dark:bg-slate-900 border-gray-200 dark:border-slate-700 shadow-sm">
               {formData.skill.map((skill) => (
                 <div
@@ -230,59 +284,77 @@ const TeacherProfile = ({ data }: { data: any }) => {
                 value={skillInput}
                 onChange={(e) => setSkillInput(e.target.value)}
                 onKeyDown={handleSkillKeyDown}
-                className="flex-grow outline-none bg-transparent text-sm placeholder:text-gray-400 dark:placeholder:text-gray-600"
+                className="flex-grow bg-transparent outline-none text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
                 placeholder="Type skill and press Enter"
+                aria-describedby={errors.skill ? "skill-error" : undefined}
               />
             </div>
+            {errors.skill && (
+              <p id="skill-error" className="text-red-600 text-sm mt-1" role="alert" aria-live="assertive">
+                {errors.skill}
+              </p>
+            )}
           </div>
 
           {/* Bio */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-2 relative">
             <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">Bio</label>
-            <Textarea name="bio" value={formData.bio} onChange={handleChange} />
+            <Textarea
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+              rows={4}
+              className="border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 focus:ring-blue-500 focus:border-blue-500 transition"
+            />
           </div>
 
-          {/* Address Fields */}
+          {/* Address */}
           {[
             ["city", "City"],
             ["homeTown", "Home Town"],
             ["presentAddress", "Present Address"],
           ].map(([name, label]) => (
-            <div className={name === "presentAddress" ? "md:col-span-2" : ""} key={name}>
-              <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">{label}</label>
+            <div key={name} className="relative">
+              <label className="block mb-1 font-medium text-gray-700 dark:text-gray-300">
+                {label} <span className="text-red-500">*</span>
+              </label>
               <Input
                 name={name}
                 value={(formData.address as any)[name]}
                 onChange={handleChange}
+                className={`border rounded-md bg-white dark:bg-gray-800 focus:ring-blue-500 focus:border-blue-500 transition ${
+                  errors[name] ? "border-red-500" : "border-gray-300 dark:border-gray-600"
+                }`}
+                aria-describedby={errors[name] ? `${name}-error` : undefined}
               />
+              {errors[name] && (
+                <p id={`${name}-error`} className="text-red-600 text-sm mt-1" role="alert" aria-live="assertive">
+                  {errors[name]}
+                </p>
+              )}
             </div>
           ))}
 
           {/* Save Button */}
-          <div className="md:col-span-2 flex justify-center mt-4">
+          <div className="md:col-span-2 flex justify-center mt-6">
             <Button
               type="button"
               onClick={handleSave}
-              className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-2 rounded-xl font-medium shadow-md transition"
+              className="bg-gradient-to-r from-blue-600 via-indigo-700 to-purple-700 hover:from-blue-700 hover:via-indigo-800 hover:to-purple-800 text-white font-semibold shadow-lg rounded-md px-8 py-3"
             >
               Save Changes
             </Button>
           </div>
         </form>
       ) : (
-        // Display mode (read-only)
         <div className="space-y-3 text-gray-900 dark:text-gray-100">
-          <div className="flex justify-center mb-6">
-            <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden ring-4 ring-blue-300 dark:ring-blue-600 shadow-md bg-gradient-to-br from-white via-slate-100 to-slate-200 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
-              <Image
-                src={previewUrl || "/default-avatar.png"}
-                alt="Profile"
-                layout="fill"
-                className="object-cover"
-              />
+          {previewUrl && (
+            <div className="flex justify-center mb-6">
+              <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-full overflow-hidden ring-4 ring-blue-400 dark:ring-blue-600 shadow-md bg-gradient-to-br from-white via-slate-100 to-slate-200 dark:from-gray-800 dark:via-gray-900 dark:to-gray-800">
+                <Image src={previewUrl} alt="Profile Picture" fill className="object-cover" />
+              </div>
             </div>
-          </div>
-
+          )}
           {[
             ["Name", formData.name],
             ["Email", formData.email],

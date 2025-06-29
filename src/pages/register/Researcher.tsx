@@ -10,71 +10,142 @@ import { Eye, EyeOff, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useResearcherRegisterMutation } from "@/redux/features/userManagement/userMamagement.api";
 import { useRouter } from "next/navigation";
-import GlobalLoader from "@/components/common/GlobalLoader";
 
 const ResearcherPage = () => {
   const [addResearcherRegister] = useResearcherRegisterMutation();
   const router = useRouter();
 
+  // Form state
   const [formData, setFormData] = useState({
-    name: "Sizzad Hosen",
-    email: "sizzad@example.com",
-    password: "123456",
-    number: "01700000000",
-    city: "Dhaka",
-    homeTown: "Rangpur",
-    presentAddress: "Uttara, Dhaka",
-    expertise: "",
-    experience: "3 years",
-    bsc: "BRUR, CSE",
-    msc: "DU, CSE",
-    phd: "Pending",
-    currentlyWorkingAt: "GreenTech Lab",
-    bio: "I am a passionate researcher in AI and Data Science.",
-    researchArea: "Natural Language Processing",
+    name: "",
+    email: "",
+    password: "",
+    number: "",
+    city: "",
+    homeTown: "",
+    presentAddress: "",
+    experience: "",
+    bsc: "",
+    msc: "",
+    phd: "",
+    currentlyWorkingAt: "",
+    bio: "",
+    researchArea: "",
+    expertise: "", // This will be cleared on skill add, but still exists here
   });
 
-  const [skills, setSkills] = useState<string[]>([]);
-  const [showPassword, setShowPassword] = useState(false);
-  const [papers, setPapers] = useState<{ title: string; url: string }[]>([]);
+  // Validation errors
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Skills and research papers
+  const [skills, setSkills] = useState<string[]>([]);
+  const [papers, setPapers] = useState<{ title: string; url: string }[]>([]);
   const [paperTitle, setPaperTitle] = useState("");
   const [paperUrl, setPaperUrl] = useState("");
 
+  // Password toggle
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Validate function
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) newErrors.name = "Name is required.";
+
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required.";
+    } else if (
+      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email.trim())
+    ) {
+      newErrors.email = "Invalid email address.";
+    }
+
+    if (!formData.password.trim()) newErrors.password = "Password is required.";
+
+    if (skills.length === 0) newErrors.skills = "At least one skill is required.";
+
+    // Research paper validation
+    papers.forEach((paper, idx) => {
+      if (!paper.title.trim())
+        newErrors[`paperTitle_${idx}`] = "Paper title is required.";
+      if (!paper.url.trim())
+        newErrors[`paperUrl_${idx}`] = "Paper URL is required.";
+      else if (
+        !/^(https?:\/\/)?([\w-]+(\.[\w-]+)+)(\/[\w- ./?%&=]*)?$/.test(paper.url.trim())
+      ) {
+        newErrors[`paperUrl_${idx}`] = "Invalid URL format.";
+      }
+    });
+
+    return newErrors;
+  };
+
+  // Handle input change and clear error for that field
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) {
+      setErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
+    }
   };
 
+  // Add skill on Enter or Comma
   const handleSkillKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if ((e.key === "Enter" || e.key === ",") && formData.expertise.trim()) {
       e.preventDefault();
-      if (!skills.includes(formData.expertise.trim())) {
-        setSkills([...skills, formData.expertise.trim()]);
+      const newSkill = formData.expertise.trim();
+      if (!skills.includes(newSkill)) {
+        setSkills([...skills, newSkill]);
+        if (errors.skills) setErrors((prev) => ({ ...prev, skills: undefined }));
       }
+      // Clear expertise input after adding
       setFormData({ ...formData, expertise: "" });
     }
   };
 
+  // Remove skill from list
   const removeSkill = (skillToRemove: string) => {
     setSkills(skills.filter((skill) => skill !== skillToRemove));
   };
 
+  // Add paper with validation
   const addPaper = () => {
-    if (paperTitle.trim()) {
-      setPapers([...papers, { title: paperTitle.trim(), url: paperUrl.trim() }]);
-      setPaperTitle("");
-      setPaperUrl("");
+    const paperErrors: Record<string, string> = {};
+
+    if (!paperTitle.trim()) paperErrors.paperTitle = "Title is required.";
+    if (!paperUrl.trim()) paperErrors.paperUrl = "URL is required.";
+    else if (
+      !/^(https?:\/\/)?([\w-]+(\.[\w-]+)+)(\/[\w- ./?%&=]*)?$/.test(paperUrl.trim())
+    )
+      paperErrors.paperUrl = "Invalid URL format.";
+
+    if (Object.keys(paperErrors).length > 0) {
+      setErrors((prev) => ({ ...prev, ...paperErrors }));
+      return;
     }
+
+    setErrors((prev) => ({ ...prev, paperTitle: undefined, paperUrl: undefined }));
+    setPapers([...papers, { title: paperTitle.trim(), url: paperUrl.trim() }]);
+    setPaperTitle("");
+    setPaperUrl("");
   };
 
+  // Remove paper by index
   const removePaper = (index: number) => {
     setPapers(papers.filter((_, idx) => idx !== index));
   };
 
+  // Submit handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      toast.error("Please fix the highlighted errors.");
+      return;
+    }
 
     const finalData = {
       ...formData,
@@ -83,7 +154,8 @@ const ResearcherPage = () => {
         homeTown: formData.homeTown,
         presentAddress: formData.presentAddress,
       },
-      skill: skills,
+      expertise: skills.length > 0 ? skills.join(", ") : "", // IMPORTANT: expertise as string
+      skill: skills, // also send skill array if backend wants it
       researchPaper: papers,
     };
 
@@ -91,267 +163,130 @@ const ResearcherPage = () => {
       const res = await addResearcherRegister(finalData).unwrap();
       if (res?.success === true) {
         toast.success("Researcher registered successfully!");
-        router.push("/");
+        router.push("/login");
       }
     } catch (error: any) {
-      toast.error("Error: " + error?.message || "Something went wrong");
+      toast.error("Error: " + (error?.message || "Something went wrong"));
     }
   };
 
   return (
-    <div className=" max-w-4xl mx-auto my-12 p-6 sm:p-10">
-      <Card className="shadow-lg rounded-xl border border-gray-200 dark:border-gray-700">
-        <CardContent className="space-y-8 p-8 bg-white dark:bg-gray-900 rounded-xl">
-          <h1 className="text-3xl font-extrabold text-center text-gray-900 dark:text-gray-100 mb-4">
+    <div className="max-w-4xl mx-auto my-12 p-6 sm:p-10">
+      <Card className="shadow-lg border border-gray-300 dark:border-gray-700">
+        <CardContent className="p-6 sm:p-8 bg-white dark:bg-gray-900 rounded-xl">
+          <h1 className="text-3xl font-bold text-center mb-6 text-gray-800 dark:text-gray-200">
             Researcher Registration
           </h1>
 
-          <form
-            onSubmit={handleSubmit}
-            className="grid grid-cols-1 md:grid-cols-2 gap-6"
-            noValidate
-          >
-            {/* Name */}
-            <div className="flex flex-col">
-              <Label htmlFor="name" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                Name <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Full Name"
-                required
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6" noValidate>
+            {/* Basic inputs */}
+            {[
+              ["name", "Name"],
+              ["email", "Email"],
+              ["password", "Password"],
+              ["number", "Phone Number"],
+              ["city", "City"],
+              ["homeTown", "Home Town"],
+              ["presentAddress", "Present Address"],
+              ["experience", "Experience"],
+              ["bsc", "BSc"],
+              ["msc", "MSc"],
+              ["phd", "PhD"],
+              ["currentlyWorkingAt", "Currently Working At"],
+              ["researchArea", "Research Area"],
+            ].map(([name, label]) => (
+              <div key={name} className="flex flex-col relative">
+                <Label htmlFor={name} className="font-semibold text-gray-700 dark:text-gray-300">
+                  {label}
+                  {["name", "email", "password"].includes(name) && (
+                    <span className="text-red-500">*</span>
+                  )}
+                </Label>
+                <Input
+                  type={name === "password" ? (showPassword ? "text" : "password") : "text"}
+                  id={name}
+                  name={name}
+                  value={(formData as any)[name]}
+                  onChange={handleChange}
+                  className={`bg-gray-50 dark:bg-gray-800 ${errors[name] ? "border-red-500" : ""}`}
+                  aria-invalid={errors[name] ? "true" : "false"}
+                  aria-describedby={`${name}-error`}
+                />
+                {name === "password" && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-[35px] text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                )}
+                {errors[name] && (
+                  <span id={`${name}-error`} className="text-red-500 text-sm mt-1">
+                    {errors[name]}
+                  </span>
+                )}
+              </div>
+            ))}
+{/* Expertise input - free text */}
+<div className="md:col-span-2">
+  <Label htmlFor="expertise" className="font-semibold text-gray-700 dark:text-gray-300">
+    Expertise (describe your main expertise)
+  </Label>
+  <Input
+    id="expertise"
+    name="expertise"
+    value={formData.expertise}
+    onChange={handleChange}
+    placeholder="Describe your main expertise"
+    className="bg-gray-50 dark:bg-gray-800"
+  />
+</div>
 
-            {/* Email */}
-            <div className="flex flex-col">
-              <Label htmlFor="email" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                Email <span className="text-red-500">*</span>
+            {/* Skills */}
+            <div className="md:col-span-2">
+              <Label className="font-semibold text-gray-700 dark:text-gray-300">
+                Add Skill / Expertise <span className="text-red-500">*</span>
               </Label>
               <Input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="email@example.com"
-                required
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* Password */}
-            <div className="flex flex-col relative">
-              <Label htmlFor="password" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                Password <span className="text-red-500">*</span>
-              </Label>
-              <Input
-                type={showPassword ? "text" : "password"}
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Enter password"
-                required
-                className="bg-gray-50 dark:bg-gray-800 pr-10"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-9 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition"
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-
-            {/* Phone Number */}
-            <div className="flex flex-col">
-              <Label htmlFor="number" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                Phone Number
-              </Label>
-              <Input
-                id="number"
-                name="number"
-                value={formData.number}
-                onChange={handleChange}
-                placeholder="+8801XXXXXXXXX"
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* City */}
-            <div className="flex flex-col">
-              <Label htmlFor="city" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                City
-              </Label>
-              <Input
-                id="city"
-                name="city"
-                value={formData.city}
-                onChange={handleChange}
-                placeholder="City"
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* Home Town */}
-            <div className="flex flex-col">
-              <Label htmlFor="homeTown" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                Home Town
-              </Label>
-              <Input
-                id="homeTown"
-                name="homeTown"
-                value={formData.homeTown}
-                onChange={handleChange}
-                placeholder="Home Town"
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* Present Address */}
-            <div className="flex flex-col md:col-span-2">
-              <Label htmlFor="presentAddress" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                Present Address
-              </Label>
-              <Input
-                id="presentAddress"
-                name="presentAddress"
-                value={formData.presentAddress}
-                onChange={handleChange}
-                placeholder="Present Address"
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* Experience */}
-            <div className="flex flex-col">
-              <Label htmlFor="experience" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                Experience
-              </Label>
-              <Input
-                id="experience"
-                name="experience"
-                value={formData.experience}
-                onChange={handleChange}
-                placeholder="Years of experience"
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* Expertise */}
-            <div className="flex flex-col">
-              <Label htmlFor="expertise" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                Add Skill / Expertise
-              </Label>
-              <Input
-                id="expertise"
                 name="expertise"
                 value={formData.expertise}
                 onChange={handleChange}
                 onKeyDown={handleSkillKeyDown}
                 placeholder="Type a skill and press Enter or Comma"
-                className="bg-gray-50 dark:bg-gray-800"
+                className={`bg-gray-50 dark:bg-gray-800 ${errors.skills ? "border-red-500" : ""}`}
+                aria-invalid={errors.skills ? "true" : "false"}
+                aria-describedby="skills-error"
               />
-            </div>
-
-            {/* Skills List */}
-            <div className="flex flex-col md:col-span-2">
-              <Label className="mb-1 font-semibold text-gray-700 dark:text-gray-300">Skills</Label>
-              <div className="flex flex-wrap gap-2">
-                {skills.length === 0 && (
-                  <p className="text-gray-500 dark:text-gray-400 italic">No skills added yet.</p>
-                )}
+              {errors.skills && (
+                <span id="skills-error" className="text-red-500 text-sm">
+                  {errors.skills}
+                </span>
+              )}
+              <div className="flex flex-wrap gap-2 mt-2">
                 {skills.map((skill, idx) => (
-                  <div
+                  <span
                     key={idx}
-                    className="flex items-center gap-1 bg-cyan-100 dark:bg-cyan-700 text-cyan-800 dark:text-cyan-100 px-3 py-1 rounded-full text-sm font-semibold"
+                    className="bg-cyan-100 dark:bg-cyan-700 text-cyan-800 dark:text-cyan-100 px-3 py-1 rounded-full text-sm flex items-center gap-1"
                   >
                     {skill}
                     <button
                       type="button"
                       onClick={() => removeSkill(skill)}
+                      className="text-red-600 dark:text-red-400 hover:text-red-800"
                       aria-label={`Remove skill ${skill}`}
-                      className="hover:text-red-600 dark:hover:text-red-400 transition"
                     >
-                      <X size={16} />
+                      <X size={14} />
                     </button>
-                  </div>
+                  </span>
                 ))}
               </div>
             </div>
 
-            {/* BSc */}
-            <div className="flex flex-col">
-              <Label htmlFor="bsc" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                BSc
-              </Label>
-              <Input
-                id="bsc"
-                name="bsc"
-                value={formData.bsc}
-                onChange={handleChange}
-                placeholder="Bachelor degree"
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* MSc */}
-            <div className="flex flex-col">
-              <Label htmlFor="msc" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                MSc
-              </Label>
-              <Input
-                id="msc"
-                name="msc"
-                value={formData.msc}
-                onChange={handleChange}
-                placeholder="Master degree"
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* PhD */}
-            <div className="flex flex-col">
-              <Label htmlFor="phd" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                PhD
-              </Label>
-              <Input
-                id="phd"
-                name="phd"
-                value={formData.phd}
-                onChange={handleChange}
-                placeholder="PhD info"
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* Currently Working At */}
-            <div className="flex flex-col md:col-span-2">
-              <Label
-                htmlFor="currentlyWorkingAt"
-                className="mb-1 font-semibold text-gray-700 dark:text-gray-300"
-              >
-                Currently Working At
-              </Label>
-              <Input
-                id="currentlyWorkingAt"
-                name="currentlyWorkingAt"
-                value={formData.currentlyWorkingAt}
-                onChange={handleChange}
-                placeholder="Organization / Company"
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-
             {/* Bio */}
-            <div className="flex flex-col md:col-span-2">
-              <Label htmlFor="bio" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
+            <div className="md:col-span-2">
+              <Label htmlFor="bio" className="font-semibold text-gray-700 dark:text-gray-300">
                 Bio
               </Label>
               <Textarea
@@ -359,73 +294,88 @@ const ResearcherPage = () => {
                 name="bio"
                 value={formData.bio}
                 onChange={handleChange}
-                placeholder="Write something about yourself"
                 rows={4}
                 className="bg-gray-50 dark:bg-gray-800"
               />
             </div>
 
-            {/* Research Area */}
-            <div className="flex flex-col md:col-span-2">
-              <Label htmlFor="researchArea" className="mb-1 font-semibold text-gray-700 dark:text-gray-300">
-                Research Area
-              </Label>
-              <Input
-                id="researchArea"
-                name="researchArea"
-                value={formData.researchArea}
-                onChange={handleChange}
-                placeholder="Your primary research area"
-                className="bg-gray-50 dark:bg-gray-800"
-              />
-            </div>
-
-            {/* Research Papers Section */}
-            <div className="flex flex-col md:col-span-2 space-y-3">
+            {/* Research Papers */}
+            <div className="md:col-span-2 space-y-3">
               <Label className="font-semibold text-gray-700 dark:text-gray-300">
                 Add Research Paper
               </Label>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <Input
-                  placeholder="Title"
-                  value={paperTitle}
-                  onChange={(e) => setPaperTitle(e.target.value)}
-                  className="bg-gray-50 dark:bg-gray-800"
-                />
-                <Input
-                  placeholder="URL"
-                  value={paperUrl}
-                  onChange={(e) => setPaperUrl(e.target.value)}
-                  className="bg-gray-50 dark:bg-gray-800"
-                />
+                <div className="flex flex-col">
+                  <Input
+                    placeholder="Title"
+                    value={paperTitle}
+                    onChange={(e) => {
+                      setPaperTitle(e.target.value);
+                      if (errors.paperTitle) {
+                        setErrors((prev) => ({ ...prev, paperTitle: undefined }));
+                      }
+                    }}
+                    className={`bg-gray-50 dark:bg-gray-800 ${errors.paperTitle ? "border-red-500" : ""}`}
+                    aria-invalid={errors.paperTitle ? "true" : "false"}
+                    aria-describedby="paperTitle-error"
+                  />
+                  {errors.paperTitle && (
+                    <span id="paperTitle-error" className="text-red-600 text-sm mt-1">
+                      {errors.paperTitle}
+                    </span>
+                  )}
+                </div>
+                <div className="flex flex-col">
+                  <Input
+                    placeholder="URL"
+                    value={paperUrl}
+                    onChange={(e) => {
+                      setPaperUrl(e.target.value);
+                      if (errors.paperUrl) {
+                        setErrors((prev) => ({ ...prev, paperUrl: undefined }));
+                      }
+                    }}
+                    className={`bg-gray-50 dark:bg-gray-800 ${errors.paperUrl ? "border-red-500" : ""}`}
+                    aria-invalid={errors.paperUrl ? "true" : "false"}
+                    aria-describedby="paperUrl-error"
+                  />
+                  {errors.paperUrl && (
+                    <span id="paperUrl-error" className="text-red-600 text-sm mt-1">
+                      {errors.paperUrl}
+                    </span>
+                  )}
+                </div>
                 <Button
                   type="button"
                   onClick={addPaper}
-                  className="sm:col-span-1 whitespace-nowrap"
+                  className="whitespace-nowrap"
                 >
                   Add Paper
                 </Button>
               </div>
 
-              {/* Papers List */}
+              {/* List of added papers */}
               {papers.length > 0 ? (
-                <ul className="list-disc pl-5 max-h-48 overflow-auto text-gray-800 dark:text-gray-300 space-y-1">
+                <ul className="list-disc pl-5 max-h-48 overflow-auto text-gray-800 dark:text-gray-300 space-y-1 mt-2">
                   {papers.map((paper, idx) => (
-                    <li key={idx} className="flex justify-between items-center">
+                    <li
+                      key={idx}
+                      className="flex justify-between items-center truncate"
+                      title={`${paper.title} - ${paper.url}`}
+                    >
                       <a
                         href={paper.url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="hover:underline text-cyan-700 dark:text-cyan-400 truncate max-w-[80%]"
-                        title={paper.title}
                       >
                         {paper.title}
                       </a>
                       <button
                         type="button"
                         onClick={() => removePaper(idx)}
+                        className="text-red-600 hover:text-red-800 dark:hover:text-red-400 transition ml-2"
                         aria-label={`Remove paper ${paper.title}`}
-                        className="text-red-600 hover:text-red-800 dark:hover:text-red-400 transition"
                       >
                         Remove
                       </button>
@@ -433,15 +383,14 @@ const ResearcherPage = () => {
                   ))}
                 </ul>
               ) : (
-                <p className="text-gray-500 dark:text-gray-400 italic">No papers added yet.</p>
+                <p className="text-gray-500 dark:text-gray-400 italic mt-2">No papers added yet.</p>
               )}
             </div>
 
-            {/* Submit Button */}
-            <div className="md:col-span-2 flex justify-center mt-4">
+            <div className="md:col-span-2 flex justify-center mt-6">
               <Button
                 type="submit"
-                className="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-10 py-3 rounded-xl shadow-lg transition"
+                className="bg-cyan-600 hover:bg-cyan-700 text-white px-6 py-2 rounded-xl font-semibold shadow-lg"
               >
                 Register
               </Button>

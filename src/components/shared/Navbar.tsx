@@ -17,6 +17,7 @@ import {
   Bell,
   ChartBarStackedIcon,
   Bot,
+  MessageSquare,
 } from "lucide-react";
 import {
   Avatar,
@@ -60,7 +61,7 @@ const handleLogout = () => {
 
   const auth = useAppSelector((state) => state.auth);
  const user = useAppSelector(selectCurrentUser);
- console.log("User in Navbar:", user);
+
  
   const navLinks = [
     { name: "Home", href: "/", icon: <Home size={16} /> },
@@ -68,6 +69,8 @@ const handleLogout = () => {
     { name: "Researchers", href: "/researchers", icon: <Users size={16} /> },
     { name: "Teachers", href: "/teachers", icon: <Users size={16} /> },
     { name: "AIAssistance", href: "/research-assistant", icon: <Bot size={16} /> },
+   
+    { name: "Message", href: "/message",   icon: <MessageSquare size={16} /> },
    
   
   ];
